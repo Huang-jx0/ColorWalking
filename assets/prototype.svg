@@ -1,0 +1,19 @@
+﻿<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7F8FA"/>
+      <stop offset="100%" stop-color="#ECEFF4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <rect x="80" y="60" width="1040" height="680" rx="28" fill="#FFFFFF" stroke="#D9DEE8"/>
+  <text x="120" y="120" font-size="36" font-family="Arial" fill="#1F2A44">ColorWalking App Prototype</text>
+  <circle cx="420" cy="420" r="220" fill="#F8FAFD" stroke="#C8D2E6" stroke-width="8"/>
+  <circle cx="420" cy="420" r="84" fill="#1F2A44"/>
+  <text x="420" y="430" text-anchor="middle" font-size="28" font-family="Arial" fill="#FFFFFF">再抽一次</text>
+  <polygon points="420,170 400,210 440,210" fill="#1F2A44"/>
+  <rect x="730" y="230" width="300" height="180" rx="20" fill="#F5F7FC" stroke="#CBD5E7"/>
+  <text x="760" y="280" font-size="24" font-family="Arial" fill="#1F2A44">今日结果</text>
+  <text x="760" y="330" font-size="20" font-family="Arial" fill="#495A7A">Lucky Blue #3A7BFF</text>
+  <text x="760" y="370" font-size="18" font-family="Arial" fill="#7A879F">愿你今天清醒又坚定</text>
+</svg>

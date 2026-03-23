@@ -1,0 +1,30 @@
+﻿# dependencies
+node_modules/
+
+# build
+apps/site/dist/
+
+# expo
+.expo/
+apps/mobile/.expo/
+
+# logs
+*.log
+site-dev.*.log
+expo-start.*.log
+
+# env/temp
+.tmp/
+.corepack/
+
+# os/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+tools/
+
+*.pid
+*.out.log
+*.err.log
