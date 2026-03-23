@@ -3,8 +3,8 @@
   "version": 2,
   "framework": "vite",
   "installCommand": "corepack enable && pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter @colorwalking/site run build",
-  "outputDirectory": "apps/site/dist",
+  "buildCommand": "pnpm --filter @colorwalking/site run build && rm -rf dist && cp -r apps/site/dist dist",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
