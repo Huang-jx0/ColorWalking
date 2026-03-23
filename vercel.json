@@ -3,7 +3,7 @@
   "version": 2,
   "framework": "vite",
   "installCommand": "corepack enable && pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter @colorwalking/site run build && node scripts/prepare-vercel-dist.cjs",
+  "buildCommand": "pnpm --filter @colorwalking/site run build && node -e \"const fs=require('fs');const p=require('path');const cwd=process.cwd();const dist=p.join(cwd,'dist');if(fs.existsSync(dist)){console.log('dist exists in cwd:',dist);process.exit(0);}const alt=p.join(cwd,'apps','site','dist');if(!fs.existsSync(alt)){console.error('No dist found in cwd or apps/site/dist');process.exit(1);}fs.rmSync(dist,{recursive:true,force:true});fs.mkdirSync(dist,{recursive:true});fs.cpSync(alt,dist,{recursive:true});console.log('copied',alt,'->',dist);\"",
   "outputDirectory": "dist",
   "rewrites": [
     {
