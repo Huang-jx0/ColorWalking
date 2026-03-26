@@ -133,12 +133,13 @@ export function WebLuckyWheel() {
 
       const sector = 360 / engine.palette.length;
       const targetCenter = draw.index * sector + sector / 2;
-      const nextAngle = angle - EXTRA_ROUNDS * 360 - targetCenter;
 
       setRitualState("spinning");
       setRitualLine("小羊卷在转盘旁边等你，一起揭晓今天的颜色。");
-      setAngle(nextAngle);
       setShareHint("");
+      window.requestAnimationFrame(() => {
+        setAngle((prev) => prev - EXTRA_ROUNDS * 360 - targetCenter);
+      });
 
       window.setTimeout(() => {
         setRitualState("revealing");
