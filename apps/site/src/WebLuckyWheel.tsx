@@ -139,6 +139,7 @@ export function WebLuckyWheel() {
 
       setRitualState("spinning");
       setSpinMs(duration);
+      window.dispatchEvent(new CustomEvent("colorwalking:draw-pending"));
       setRitualLine("小羊卷在转盘旁边等你，一起揭晓今天的颜色。");
       setShareHint("");
       window.requestAnimationFrame(() => {

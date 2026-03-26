@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { COLOR_PALETTE, formatDayKey } from "@colorwalking/shared";
+import { createMessagePicker } from "./pet/messages";
+import { nextPresenceState, presenceStateDurationMs } from "./pet/stateMachine";
+import { canTrigger, randomInRange } from "./pet/timing";
+import type { MessageBucket, PetPresenceEvent, PetPresenceState } from "./pet/types";
+import { usePetPresence } from "./pet/usePetPresence";
 
 type PetMemory = {
   id: string;
@@ -45,40 +50,10 @@ type PetEmotion = "happy" | "needy" | "bored" | "sleepy" | "upset";
 
 const PET_KEY = "colorwalking.pet.v1";
 const DRAW_EVENT = "colorwalking:draw-updated";
+const DRAW_PENDING_EVENT = "colorwalking:draw-pending";
 const LEVEL_XP = 100;
 const WALK_SECONDS = 30;
-const WALK_SOUVENIRS = ["\u53f6\u5b50\u80f8\u9488", "\u5f69\u8679\u77f3", "\u7ed2\u6bdb\u56e2\u5b50", "\u5c0f\u94c3\u94db", "\u661f\u5149\u7f0e\u5e26"];
-const PET_DIALOG = {
-  idle: [
-    "\u6211\u5728\u8fd9\u91cc\uff0c\u4f60\u6162\u6162\u6765\u5c31\u597d\u3002",
-    "\u4f60\u5148\u5fd9\u4f60\u7684\uff0c\u6211\u4f1a\u5728\u65c1\u8fb9\u966a\u7740\u3002",
-    "\u4eca\u5929\u4e5f\u6211\u4eec\u4e00\u8d77\u7a33\u7a33\u5730\u8fc7\u3002"
-  ],
-  click: [
-    "\u8fd9\u4e00\u4e0b\u597d\u6e29\u67d4\uff0c\u6211\u8bb0\u4f4f\u4e86\u3002",
-    "\u88ab\u4f60\u6478\u6478\uff0c\u6211\u5fc3\u60c5\u53d8\u5f97\u5f88\u5b89\u5b9a\u3002",
-    "\u8c22\u8c22\u4f60\u62bd\u7a7a\u7406\u6211\uff0c\u6211\u6709\u88ab\u7167\u987e\u5230\u3002"
-  ],
-  care: [
-    "\u4f60\u7167\u987e\u6211\u7684\u65f6\u5019\uff0c\u6211\u6574\u4e2a\u5fc3\u90fd\u5b89\u5b9a\u4e0b\u6765\u3002",
-    "\u6709\u4f60\u5728\uff0c\u6211\u7684\u5c0f\u5fc3\u60c5\u5c31\u4e0d\u4f1a\u4e71\u8dd1\u3002",
-    "\u88ab\u4f60\u8fd9\u6837\u653e\u5728\u5fc3\u4e0a\uff0c\u771f\u7684\u5f88\u5e78\u798f\u3002"
-  ],
-  cuddle: [
-    "\u8fd9\u4e2a\u62b1\u62b1\u597d\u6696\uff0c\u6211\u4f1a\u8bb0\u5f88\u4e45\u3002",
-    "\u548c\u4f60\u8d34\u8d34\u7684\u65f6\u5019\uff0c\u6211\u89c9\u5f97\u5f88\u5b89\u5fc3\u3002",
-    "\u62b1\u62b1\u5b8c\u6210\uff0c\u6211\u53c8\u88ab\u8f7b\u8f7b\u5145\u6ee1\u7535\u4e86\u3002"
-  ],
-  hover: [
-    "\u4f60\u770b\u6211\u7684\u65f6\u5019\uff0c\u6211\u4e5f\u5728\u60a0\u60a0\u5730\u770b\u4f60\u3002",
-    "\u6211\u628a\u8033\u6735\u7ad6\u8d77\u6765\u4e86\uff0c\u5728\u542c\u4f60\u7684\u5fc3\u60c5\u3002"
-  ],
-  luckyBless: [
-    "\u8fd9\u4e2a\u989c\u8272\u5f88\u9002\u5408\u4eca\u5929\u7684\u4f60\u3002",
-    "\u6211\u5df2\u7ecf\u628a\u8fd9\u4e2a\u5e78\u8fd0\u8272\u8bb0\u4f4f\u4e86\uff0c\u4eca\u5929\u4e00\u8d77\u6162\u6162\u6765\u3002",
-    "\u989c\u8272\u5df2\u7ecf\u62bd\u597d\u4e86\uff0c\u540e\u9762\u7684\u8def\u6211\u4e5f\u966a\u4f60\u8d70\u3002"
-  ]
-} as const;
+const WALK_SOUVENIRS = ["叶子胸针", "彩虹石", "绒毛团子", "小铃铛", "星光缎带"];
 
 function clamp(value: number, min = 0, max = 100): number {
   return Math.min(max, Math.max(min, value));
@@ -118,19 +93,19 @@ function inferEmotion(state: PetState): PetEmotion {
 }
 
 function emotionLabel(emotion: PetEmotion): string {
-  if (emotion === "sleepy") return "\u56f0\u56f0";
-  if (emotion === "upset") return "\u59d4\u5c48";
-  if (emotion === "needy") return "\u60f3\u4f60";
-  if (emotion === "bored") return "\u65e0\u804a";
-  return "\u5f00\u5fc3";
+  if (emotion === "sleepy") return "困困";
+  if (emotion === "upset") return "委屈";
+  if (emotion === "needy") return "想你";
+  if (emotion === "bored") return "无聊";
+  return "开心";
 }
 
 function emotionVoice(emotion: PetEmotion): string {
-  if (emotion === "sleepy") return "\u6211\u6709\u70b9\u56f0\u4e86\uff0c\u60f3\u5728\u4f60\u65c1\u8fb9\u5b89\u9759\u5f85\u4e00\u4f1a\u3002";
-  if (emotion === "upset") return "\u6211\u5fc3\u91cc\u6709\u70b9\u4e71\uff0c\u4f60\u5728\u7684\u8bdd\u6211\u4f1a\u597d\u5f88\u591a\u3002";
-  if (emotion === "needy") return "\u6211\u521a\u624d\u4e00\u76f4\u5728\u7b49\u4f60\uff0c\u4f60\u6765\u4e86\u6211\u5c31\u653e\u5fc3\u4e86\u3002";
-  if (emotion === "bored") return "\u6211\u60f3\u548c\u4f60\u73a9\u4e00\u4f1a\uff0c\u6211\u4eec\u4e00\u8d77\u52a8\u4e00\u52a8\u5427\u3002";
-  return "\u6211\u4eca\u5929\u72b6\u6001\u4e0d\u9519\uff0c\u60f3\u597d\u597d\u966a\u5728\u4f60\u8eab\u8fb9\u3002";
+  if (emotion === "sleepy") return "我有点困了，想在你旁边安静待一会。";
+  if (emotion === "upset") return "我心里有点乱，你在的话我会好很多。";
+  if (emotion === "needy") return "刚才一直在等你，你来了我就放心了。";
+  if (emotion === "bored") return "想和你玩一会，我们一起动一动吧。";
+  return "我今天状态不错，想好好陪在你身边。";
 }
 
 function defaultPet(): PetState {
@@ -138,7 +113,7 @@ function defaultPet(): PetState {
   const now = new Date();
   const nowIso = now.toISOString();
   return {
-    name: "\u5c0f\u7f8a\u5377",
+    name: "小羊卷",
     level: 1,
     xp: 0,
     hunger: 25,
@@ -149,7 +124,7 @@ function defaultPet(): PetState {
     lastInteractedAt: nowIso,
     lastPlayAt: nowIso,
     lastGreetDayKey: formatDayKey(now),
-    memories: [makeMemory("\ud83d\udc9b", "\u7b2c\u4e00\u5929\u5165\u4f4f\u5c0f\u7f8a\u5377\u517b\u6210\u8231\uff0c\u5b83\u5f88\u9ad8\u5174\u8ba4\u8bc6\u4f60\u3002", now)],
+    memories: [makeMemory("💛", "第一天入住小羊卷养成舱，它很高兴认识你。", now)],
     souvenirs: [],
     walkTask: { status: "idle", endsAt: null, lastDoneDayKey: "", souvenirPreview: "" },
     lastWheelBlessedId: "",
@@ -238,63 +213,64 @@ function todayLuckyColorId(): string | null {
 }
 
 function moodText(mood: number): string {
-  if (mood >= 85) return "\u4eca\u5929\u7f8a\u5377\u5f88\u8f7b\u5feb\uff0c\u60f3\u966a\u4f60\u591a\u8d70\u4e00\u4f1a\u3002";
-  if (mood >= 65) return "\u72b6\u6001\u5f88\u5e73\u7a33\uff0c\u5c31\u8fd9\u6837\u6162\u6162\u4fdd\u6301\u5c31\u597d\u3002";
-  if (mood >= 40) return "\u7f8a\u5377\u6709\u70b9\u6ca1\u7cbe\u795e\uff0c\u60f3\u88ab\u4f60\u518d\u7167\u987e\u4e00\u4e0b\u3002";
-  return "\u7f8a\u5377\u6b63\u5728\u4f4e\u843d\u671f\uff0c\u6478\u6478\u5b83\u6216\u966a\u5b83\u73a9\u4e00\u4e0b\u5427\u3002";
+  if (mood >= 85) return "今天羊卷很轻快，想陪你多走一会。";
+  if (mood >= 65) return "状态很平稳，就这样慢慢保持就好。";
+  if (mood >= 40) return "羊卷有点没精神，想被你再照顾一下。";
+  return "羊卷正在低落期，摸摸它或陪它玩一下吧。";
 }
 
 function reactionByAction(action: PetAction): string {
-  if (action === "feed") return "\ud83c\udf3f";
-  if (action === "play") return "\ud83c\udf89";
-  if (action === "rest") return "\ud83d\udca4";
-  if (action === "groom") return "\u2728";
-  if (action === "cuddle") return "\ud83e\udd17";
-  if (action === "hop") return "\ud83d\udc83";
-  if (action === "yawn") return "\ud83d\ude2a";
-  if (action === "look") return "\ud83d\udc40";
-  return "\ud83d\udc95";
+  if (action === "feed") return "🌿";
+  if (action === "play") return "🎉";
+  if (action === "rest") return "💤";
+  if (action === "groom") return "✨";
+  if (action === "cuddle") return "🤗";
+  if (action === "hop") return "💃";
+  if (action === "yawn") return "😪";
+  if (action === "look") return "👀";
+  return "💕";
 }
 
-function linesByAction(action: PetAction): readonly string[] {
-  if (action === "cuddle") return PET_DIALOG.cuddle;
-  if (action === "pet") return PET_DIALOG.click;
-  if (action === "look") return PET_DIALOG.hover;
-  if (action === "feed" || action === "play" || action === "rest" || action === "groom") return PET_DIALOG.care;
-  return PET_DIALOG.idle;
+function actionMessageBucket(action: PetAction): MessageBucket {
+  if (action === "pet" || action === "cuddle") return "clickMessages";
+  if (action === "look") return "noticeMessages";
+  if (action === "hop") return "curiousMessages";
+  if (action === "yawn") return "sleepyMessages";
+  if (action === "feed" || action === "play" || action === "rest" || action === "groom") return "comfortMessages";
+  return "repeatVisitMessages";
 }
 
 function pickIdleAction(emotion: PetEmotion): { action: PetAction; hint: string } {
   if (emotion === "sleepy") {
     return Math.random() > 0.45
-      ? { action: "yawn", hint: "\u7f8a\u5377\u6253\u4e86\u4e2a\u54c8\u6b20\uff0c\u6162\u6162\u5730\u9760\u8fd1\u4f60\u3002" }
-      : { action: "look", hint: "\u7f8a\u5377\u773c\u795e\u8f6f\u8f6f\u7684\uff0c\u50cf\u5728\u5bfb\u627e\u4e00\u70b9\u5b89\u5fc3\u611f\u3002" };
+      ? { action: "yawn", hint: "羊卷打了个哈欠，慢慢地靠近你。" }
+      : { action: "look", hint: "羊卷眼神软软的，像在寻找一点安心感。" };
   }
   if (emotion === "upset") {
     return Math.random() > 0.5
-      ? { action: "look", hint: "\u7f8a\u5377\u60c5\u7eea\u6709\u70b9\u4f4e\uff0c\u6b63\u5728\u7b49\u4f60\u6478\u6478\u5b83\u3002" }
-      : { action: "yawn", hint: "\u7f8a\u5377\u5c0f\u58f0\u54fc\u4e86\u4e00\u4e0b\uff0c\u50cf\u5728\u5411\u4f60\u8981\u5b89\u6170\u3002" };
+      ? { action: "look", hint: "羊卷情绪有点低，正在等你摸摸它。" }
+      : { action: "yawn", hint: "羊卷小声哼了一下，像在向你要安慰。" };
   }
   if (emotion === "needy") {
     return Math.random() > 0.45
-      ? { action: "look", hint: "\u7f8a\u5377\u542c\u5230\u4f60\u7684\u52a8\u9759\uff0c\u7acb\u523b\u671b\u8fc7\u6765\u4e86\u3002" }
-      : { action: "hop", hint: "\u7f8a\u5377\u5728\u539f\u5730\u8df3\u4e86\u4e00\u4e0b\uff0c\u50cf\u5728\u8bf4\u201c\u6211\u5728\u8fd9\u91cc\u201d\u3002" };
+      ? { action: "look", hint: "羊卷听到你的动静，立刻望过来了。" }
+      : { action: "hop", hint: "羊卷在原地跳了一下，像在说“我在这里”。" };
   }
   if (emotion === "bored") {
     return Math.random() > 0.4
-      ? { action: "hop", hint: "\u7f8a\u5377\u60f3\u627e\u70b9\u4e50\u5b50\uff0c\u5728\u7b49\u4f60\u548c\u5b83\u4e00\u8d77\u73a9\u3002" }
-      : { action: "look", hint: "\u7f8a\u5377\u5230\u5904\u770b\u4e86\u770b\uff0c\u597d\u50cf\u60f3\u51fa\u53bb\u8d70\u8d70\u3002" };
+      ? { action: "hop", hint: "羊卷想找点乐子，在等你和它一起玩。" }
+      : { action: "look", hint: "羊卷到处看了看，好像想出去走走。" };
   }
   return Math.random() > 0.5
-    ? { action: "hop", hint: "\u7f8a\u5377\u5fc3\u60c5\u4e0d\u9519\uff0c\u60f3\u5728\u4f60\u8eab\u8fb9\u591a\u505c\u7559\u4e00\u4f1a\u3002" }
-    : { action: "look", hint: "\u7f8a\u5377\u6b6a\u5934\u770b\u4f60\uff0c\u773c\u795e\u91cc\u6709\u5f88\u591a\u4f9d\u8d56\u3002" };
+    ? { action: "hop", hint: "羊卷心情不错，想在你身边多停留一会。" }
+    : { action: "look", hint: "羊卷歪头看你，眼神里有很多依赖。" };
 }
 
 function dailyGreeting(name: string): string {
   const pool = [
-    `\u65b0\u7684\u4e00\u5929\u5f00\u59cb\u4e86\uff0c${name}\u5df2\u7ecf\u5728\u8fd9\u91cc\u7b49\u4f60\u3002`,
-    `\u4eca\u5929\u4e5f\u8bf7\u597d\u597d\u7167\u987e\u81ea\u5df1\uff0c${name}\u4f1a\u4e00\u76f4\u966a\u7740\u4f60\u3002`,
-    `\u4f60\u4e00\u51fa\u73b0\uff0c${name}\u6574\u4e2a\u5fc3\u60c5\u90fd\u4eae\u4e86\u4e00\u70b9\u3002`
+    `新的一天开始了，${name}已经在这里等你。`,
+    `今天也请好好照顾自己，${name}会一直陪着你。`,
+    `你一出现，${name}的心情就亮了一点。`
   ];
   return pool[Math.floor(Math.random() * pool.length)] ?? pool[0];
 }
@@ -318,26 +294,27 @@ function latestWheelDraw(): WheelHistoryItem | null {
   }
 }
 
-function pickLine(lines: readonly string[], lastLine: string): string {
-  if (!lines.length) return "";
-  if (lines.length === 1) return lines[0] ?? "";
-  const pool = lines.filter((x) => x !== lastLine);
-  const list = pool.length ? pool : lines;
-  return list[Math.floor(Math.random() * list.length)] ?? list[0] ?? "";
-}
-
 export function SheepPetGarden() {
   const [pet, setPet] = useState<PetState>(() => loadPet());
-  const [hint, setHint] = useState("\u6b22\u8fce\u6765\u5230\u5c0f\u7f8a\u5377\u7684\u5c0f\u5c4b\uff0c\u6bcf\u5929\u6765\u770b\u5b83\u4e00\u6b21\uff0c\u5b83\u4f1a\u6162\u6162\u66f4\u4f9d\u8d56\u4f60\u3002");
-  const [bubbleText, setBubbleText] = useState("\u6211\u5728\u8fd9\u91cc\uff0c\u6162\u6162\u966a\u7740\u4f60\u3002");
+  const [hint, setHint] = useState("欢迎来到小羊卷的小屋，每天来看看它一次，它会慢慢更依赖你。");
+  const [bubbleText, setBubbleText] = useState("我在这里，慢慢陪着你。");
   const [bubbleTick, setBubbleTick] = useState(0);
   const [petAction, setPetAction] = useState<PetAction>("idle");
   const [reaction, setReaction] = useState("");
   const [walkCountdown, setWalkCountdown] = useState(0);
+  const [presenceState, setPresenceState] = useState<PetPresenceState>("enter");
+
+  const petPresenceRef = useRef<PetPresenceState>("enter");
+  const messagePickerRef = useRef(createMessagePicker(6));
   const holdTimerRef = useRef<number | null>(null);
   const holdTriggeredRef = useRef(false);
-  const lastLineRef = useRef("");
-  const hoverAtRef = useRef(0);
+  const stateTimerRef = useRef<number | null>(null);
+  const proactiveTimerRef = useRef<number | null>(null);
+  const lastStateChangeAtRef = useRef(0);
+  const lastClickFeedbackAtRef = useRef(0);
+  const lastProactiveSpeechAtRef = useRef(0);
+  const proactiveCooldownRef = useRef(randomInRange(20000, 40000));
+  const avatarBoxRef = useRef<HTMLDivElement | null>(null);
 
   const favoriteColor = useMemo(
     () => COLOR_PALETTE.find((c) => c.id === pet.favoriteColorId) ?? COLOR_PALETTE[0],
@@ -351,6 +328,25 @@ export function SheepPetGarden() {
   const eyesClosed = pet.energy < 22;
   const smileWide = pet.mood >= 70;
 
+  const speak = useCallback(
+    (bucket: MessageBucket, options?: { force?: boolean; setHintText?: boolean }): string => {
+      const force = Boolean(options?.force);
+      if (!force) {
+        const now = Date.now();
+        if (!canTrigger(lastProactiveSpeechAtRef.current, proactiveCooldownRef.current, now)) return "";
+        lastProactiveSpeechAtRef.current = now;
+        proactiveCooldownRef.current = randomInRange(20000, 40000);
+      }
+      const line = messagePickerRef.current(bucket);
+      if (!line) return "";
+      setBubbleText(line);
+      setBubbleTick((x) => x + 1);
+      if (options?.setHintText) setHint(line);
+      return line;
+    },
+    []
+  );
+
   const triggerAction = useCallback((action: PetAction) => {
     setPetAction(action);
     setReaction(reactionByAction(action));
@@ -358,14 +354,68 @@ export function SheepPetGarden() {
     window.setTimeout(() => setReaction(""), 1100);
   }, []);
 
-  const speak = useCallback((lines: readonly string[]) => {
-    const line = pickLine(lines, lastLineRef.current);
-    if (!line) return "";
-    lastLineRef.current = line;
-    setBubbleText(line);
-    setBubbleTick((x) => x + 1);
-    return line;
+  const dispatchPresence = useCallback((event: PetPresenceEvent) => {
+    const now = Date.now();
+    const forceEvent = event === "BOOT" || event === "ENTER_DONE" || event === "DRAW_SUCCESS" || event === "DRAW_PENDING";
+    if (!forceEvent && !canTrigger(lastStateChangeAtRef.current, 220, now)) return;
+
+    const current = petPresenceRef.current;
+    const next = nextPresenceState(current, event, { hasDrawToday: Boolean(todayLuckyColorId()) });
+    if (next === current) return;
+    lastStateChangeAtRef.current = now;
+    petPresenceRef.current = next;
+    setPresenceState(next);
   }, []);
+
+  const lookOffset = usePetPresence({
+    zoneRef: avatarBoxRef,
+    onEvent: dispatchPresence
+  });
+
+  useEffect(() => {
+    dispatchPresence("BOOT");
+  }, [dispatchPresence]);
+
+  useEffect(() => {
+    if (stateTimerRef.current) window.clearTimeout(stateTimerRef.current);
+    const life = presenceStateDurationMs(presenceState);
+    if (life) {
+      const timeoutEvent: PetPresenceEvent = presenceState === "enter" ? "ENTER_DONE" : "STATE_TIMEOUT";
+      stateTimerRef.current = window.setTimeout(() => dispatchPresence(timeoutEvent), life);
+    }
+
+    if (presenceState === "enter") {
+      speak("enterMessages", { force: true });
+    } else if (presenceState === "notice") {
+      speak("noticeMessages");
+    } else if (presenceState === "curious") {
+      speak("curiousMessages");
+    } else if (presenceState === "happy") {
+      speak("happyMessages", { force: true, setHintText: true });
+    } else if (presenceState === "comfort") {
+      speak("comfortMessages");
+    } else if (presenceState === "sleepy") {
+      speak("sleepyMessages");
+    } else if (presenceState === "farewell") {
+      speak("farewellMessages", { force: true });
+    }
+
+    return () => {
+      if (stateTimerRef.current) window.clearTimeout(stateTimerRef.current);
+    };
+  }, [presenceState, dispatchPresence, speak]);
+
+  useEffect(() => {
+    if (proactiveTimerRef.current) window.clearTimeout(proactiveTimerRef.current);
+    const delay = randomInRange(26000, 42000);
+    proactiveTimerRef.current = window.setTimeout(() => {
+      if (petPresenceRef.current === "comfort") speak("comfortMessages");
+      if (petPresenceRef.current === "idle") speak("repeatVisitMessages");
+    }, delay);
+    return () => {
+      if (proactiveTimerRef.current) window.clearTimeout(proactiveTimerRef.current);
+    };
+  }, [presenceState, speak]);
 
   useEffect(() => {
     const today = formatDayKey(new Date());
@@ -378,23 +428,23 @@ export function SheepPetGarden() {
           lastGreetDayKey: today,
           lastUpdatedAt: new Date().toISOString()
         },
-        "\ud83c\udf1e",
-        "\u4eca\u65e5\u95ee\u5019\uff1a\u4f60\u4e00\u51fa\u73b0\uff0c\u5b83\u5c31\u6162\u6162\u5b89\u5fc3\u4e86\u3002"
+        "🌤",
+        "今日问候：你一出现，它就慢慢安心了。"
       );
       savePet(next);
       setHint(dailyGreeting(prev.name));
-      speak(PET_DIALOG.idle);
+      speak("repeatVisitMessages", { force: true });
       return next;
     });
   }, [speak]);
 
   useEffect(() => {
-    const delay = 6000 + Math.floor(Math.random() * 6000);
+    const delay = 6000 + Math.floor(Math.random() * 7000);
     const timer = window.setTimeout(() => {
       const auto = pickIdleAction(inferEmotion(pet));
       triggerAction(auto.action);
       setHint(auto.hint);
-      speak(PET_DIALOG.idle);
+      speak(actionMessageBucket(auto.action));
     }, delay);
     return () => window.clearTimeout(timer);
   }, [pet, triggerAction, speak]);
@@ -410,6 +460,7 @@ export function SheepPetGarden() {
       if (remain > 0) return;
       const souvenir = WALK_SOUVENIRS[Math.floor(Math.random() * WALK_SOUVENIRS.length)] ?? WALK_SOUVENIRS[0];
       triggerAction("hop");
+      dispatchPresence("DRAW_SUCCESS");
       setPet((prev) => {
         if (prev.walkTask.status !== "walking") return prev;
         const today = formatDayKey(new Date());
@@ -437,52 +488,54 @@ export function SheepPetGarden() {
             lastInteractedAt: new Date().toISOString(),
             lastUpdatedAt: new Date().toISOString()
           },
-          "\ud83c\udf81",
-          `\u6563\u6b65\u5b8c\u6210\uff0c\u5e26\u56de\u4e86${souvenir}\u3002`
+          "🎁",
+          `散步完成，带回了${souvenir}。`
         );
         savePet(done);
         return done;
       });
-      setHint(`\u6563\u6b65\u56de\u6765\u4e86\uff0c\u5b83\u60f3\u628a${souvenir}\u9001\u7ed9\u4f60\u3002`);
+      setHint(`散步回来啦，它想把${souvenir}送给你。`);
     };
     tick();
     const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
-  }, [pet.walkTask.status, pet.walkTask.endsAt, triggerAction]);
+  }, [pet.walkTask.status, pet.walkTask.endsAt, triggerAction, dispatchPresence]);
 
-  const blessFromDraw = useCallback((draw: WheelHistoryItem | null) => {
-    if (!draw?.id || !draw.color?.id) return;
-    setPet((prev) => {
-      if (prev.lastWheelBlessedId === draw.id) return prev;
-      const blessedLine = speak(PET_DIALOG.luckyBless);
-      const base = gainXp(
-        {
-          ...prev,
-          favoriteColorId: draw.color.id ?? prev.favoriteColorId,
-          mood: clamp(prev.mood + 6),
-          lastWheelBlessedId: draw.id
-        },
-        8
-      );
-      const mood = calcMood(base.hunger, base.energy, base.cleanliness, base.level);
-      const next = pushMemory(
-        {
-          ...base,
-          mood,
-          lastInteractedAt: new Date().toISOString(),
-          lastUpdatedAt: new Date().toISOString()
-        },
-        "\ud83c\udf08",
-        `\u4f60\u62bd\u5230\u4e86${draw.color.name ?? "\u5e78\u8fd0\u8272"}\uff0c\u7f8a\u5377\u4e3a\u4f60\u8bb0\u4e0b\u4e86\u4eca\u5929\u7684\u8fd9\u4efd\u989c\u8272\u3002`
-      );
-      savePet(next);
-      if (blessedLine) {
-        setHint(blessedLine);
-      }
-      triggerAction("pet");
-      return next;
-    });
-  }, [speak, triggerAction]);
+  const blessFromDraw = useCallback(
+    (draw: WheelHistoryItem | null) => {
+      if (!draw?.id || !draw.color?.id) return;
+      setPet((prev) => {
+        if (prev.lastWheelBlessedId === draw.id) return prev;
+        const blessedLine = speak("luckyColorMessages", { force: true, setHintText: true });
+        const base = gainXp(
+          {
+            ...prev,
+            favoriteColorId: draw.color.id ?? prev.favoriteColorId,
+            mood: clamp(prev.mood + 6),
+            lastWheelBlessedId: draw.id
+          },
+          8
+        );
+        const mood = calcMood(base.hunger, base.energy, base.cleanliness, base.level);
+        const next = pushMemory(
+          {
+            ...base,
+            mood,
+            lastInteractedAt: new Date().toISOString(),
+            lastUpdatedAt: new Date().toISOString()
+          },
+          "🌈",
+          `你抽到了${draw.color.name ?? "幸运色"}，羊卷为你记下了今天的这份颜色。`
+        );
+        savePet(next);
+        if (blessedLine) setHint(blessedLine);
+        triggerAction("pet");
+        dispatchPresence("DRAW_SUCCESS");
+        return next;
+      });
+    },
+    [speak, triggerAction, dispatchPresence]
+  );
 
   useEffect(() => {
     blessFromDraw(latestWheelDraw());
@@ -493,22 +546,32 @@ export function SheepPetGarden() {
       const detail = (e as CustomEvent<WheelHistoryItem>).detail;
       blessFromDraw(detail ?? latestWheelDraw());
     };
+    const onDrawPending = () => {
+      dispatchPresence("DRAW_PENDING");
+      triggerAction("look");
+      speak("noticeMessages", { force: true });
+    };
     const onStorage = (e: StorageEvent) => {
-      if (e.key === "colorwalking.web.history.v1") {
-        blessFromDraw(latestWheelDraw());
-      }
+      if (e.key === "colorwalking.web.history.v1") blessFromDraw(latestWheelDraw());
     };
     window.addEventListener(DRAW_EVENT, onDrawUpdate as EventListener);
+    window.addEventListener(DRAW_PENDING_EVENT, onDrawPending);
     window.addEventListener("storage", onStorage);
     return () => {
       window.removeEventListener(DRAW_EVENT, onDrawUpdate as EventListener);
+      window.removeEventListener(DRAW_PENDING_EVENT, onDrawPending);
       window.removeEventListener("storage", onStorage);
     };
-  }, [blessFromDraw]);
+  }, [blessFromDraw, dispatchPresence, triggerAction, speak]);
 
-  const runAction = (action: PetAction, updater: (state: PetState) => PetState, message: string, memory?: { icon: string; text: string }) => {
+  const runAction = (
+    action: PetAction,
+    updater: (state: PetState) => PetState,
+    message: string,
+    memory?: { icon: string; text: string }
+  ) => {
     triggerAction(action);
-    speak(linesByAction(action));
+    speak(actionMessageBucket(action), { force: true });
     setPet((prev) => {
       const decayed = applyDecay(prev);
       const nextBase = updater(decayed);
@@ -532,8 +595,8 @@ export function SheepPetGarden() {
     runAction(
       "feed",
       (s) => gainXp({ ...s, hunger: clamp(s.hunger - 24), energy: clamp(s.energy + 4) }, 14),
-      "\u4f60\u5582\u4e86\u4e00\u70b9\u5c0f\u70b9\u5fc3\uff0c\u5c0f\u7f8a\u5377\u72b6\u6001\u597d\u4e86\u8bb8\u591a\u3002",
-      { icon: "\ud83c\udf3f", text: "\u4f60\u4eec\u5206\u4eab\u4e86\u4e00\u6b21\u8f7b\u677e\u7684\u5c0f\u70b9\u5fc3\u65f6\u95f4\u3002" }
+      "你喂了一点小点心，小羊卷状态好了许多。",
+      { icon: "🌿", text: "你们分享了一次轻松的小点心时间。" }
     );
 
   const play = () =>
@@ -549,40 +612,40 @@ export function SheepPetGarden() {
           },
           20
         ),
-      "\u4f60\u966a\u5b83\u8dd1\u5708\u73a9\u7403\uff0c\u6bdb\u5377\u98de\u8d77\u6765\u4e86\u3002",
-      { icon: "\ud83c\udf89", text: "\u4f60\u4eec\u4e00\u8d77\u73a9\u5f97\u5f88\u5f00\u5fc3\uff0c\u5fc3\u60c5\u4e5f\u6d3b\u8dc3\u4e86\u4e00\u70b9\u3002" }
+      "你陪它跑圈玩球，毛卷飞起来了。",
+      { icon: "🎉", text: "你们一起玩得很开心，心情也活跃了一点。" }
     );
 
   const rest = () =>
     runAction(
       "rest",
       (s) => gainXp({ ...s, energy: clamp(s.energy + 26), hunger: clamp(s.hunger + 4) }, 10),
-      "\u5c0f\u7f8a\u5377\u6253\u4e86\u4e2a\u5c0f\u76f9\uff0c\u6162\u6162\u56de\u590d\u4e86\u7cbe\u795e\u3002",
-      { icon: "\ud83d\udca4", text: "\u5b83\u5728\u4f60\u8eab\u8fb9\u5b89\u5fc3\u5730\u4f11\u606f\u4e86\u4e00\u4f1a\u513f\u3002" }
+      "小羊卷打了个小盹，慢慢恢复了精神。",
+      { icon: "💤", text: "它在你身边安心地休息了一会儿。" }
     );
 
   const groom = () =>
     runAction(
       "groom",
       (s) => gainXp({ ...s, cleanliness: clamp(s.cleanliness + 24), mood: clamp(s.mood + 8) }, 12),
-      "\u4f60\u5e2e\u5b83\u68b3\u4e86\u6bdb\uff0c\u5b83\u770b\u8d77\u6765\u66f4\u8212\u670d\u4e86\u3002",
-      { icon: "\u2728", text: "\u5c0f\u7f8a\u5377\u88ab\u4f60\u6253\u7406\u5f97\u5f88\u5e72\u51c0\uff0c\u7cbe\u795e\u4e5f\u597d\u4e86\u8d77\u6765\u3002" }
+      "你帮它梳了毛，它看起来更舒服了。",
+      { icon: "✨", text: "小羊卷被你打理得很干净，精神也好了起来。" }
     );
 
   const petHead = () =>
     runAction(
       "pet",
       (s) => gainXp({ ...s, mood: clamp(s.mood + 6), energy: clamp(s.energy + 2) }, 6),
-      "\u5c0f\u7f8a\u5377\u88ab\u4f60\u6478\u5f97\u5f88\u5f00\u5fc3\uff0c\u6574\u4e2a\u4eba\u90fd\u8f6f\u4e0b\u6765\u4e86\u3002",
-      { icon: "\ud83d\udc95", text: "\u4f60\u6478\u4e86\u6478\u5b83\uff0c\u5b83\u7528\u4f9d\u8d56\u56de\u5e94\u4e86\u4f60\u3002" }
+      "小羊卷被你摸得很开心，整个人都软下来啦。",
+      { icon: "💕", text: "你摸了摸它，它用依赖回应了你。" }
     );
 
   const cuddle = () =>
     runAction(
       "cuddle",
       (s) => gainXp({ ...s, mood: clamp(s.mood + 12), energy: clamp(s.energy + 6) }, 10),
-      "\u4f60\u62b1\u4e86\u62b1\u5b83\uff0c\u7f8a\u5377\u6162\u6162\u653e\u677e\u4e0b\u6765\uff0c\u4f60\u4e5f\u53ef\u4ee5\u4f11\u606f\u4e00\u4e0b\u4e86\u3002",
-      { icon: "\ud83e\udd17", text: "\u4f60\u4eec\u5206\u4eab\u4e86\u4e00\u4e2a\u62b1\u62b1\uff0c\u5fc3\u60c5\u90fd\u53d8\u67d4\u548c\u4e86\u3002" }
+      "你抱了抱它，羊卷慢慢放松下来，你也可以休息一下了。",
+      { icon: "🤗", text: "你们分享了一个抱抱，心情都变柔和了。" }
     );
 
   const startHold = () => {
@@ -591,7 +654,7 @@ export function SheepPetGarden() {
     holdTimerRef.current = window.setTimeout(() => {
       holdTriggeredRef.current = true;
       cuddle();
-    }, 600);
+    }, 650);
   };
 
   const cancelHold = () => {
@@ -602,19 +665,21 @@ export function SheepPetGarden() {
   };
 
   const onAvatarClick = () => {
+    dispatchPresence("POINTER_CLICK");
     if (holdTriggeredRef.current) {
       holdTriggeredRef.current = false;
       return;
     }
+    const now = Date.now();
+    if (!canTrigger(lastClickFeedbackAtRef.current, 420, now)) return;
+    lastClickFeedbackAtRef.current = now;
     petHead();
   };
 
   const onAvatarHover = () => {
-    const now = Date.now();
-    if (now - hoverAtRef.current < 2200) return;
-    hoverAtRef.current = now;
+    dispatchPresence("POINTER_NEAR");
     triggerAction("look");
-    speak(PET_DIALOG.hover);
+    speak("noticeMessages");
   };
 
   const startWalkTask = () => {
@@ -622,11 +687,11 @@ export function SheepPetGarden() {
     const today = formatDayKey(new Date());
     const remainSec = pet.walkTask.endsAt ? Math.max(0, Math.ceil((new Date(pet.walkTask.endsAt).getTime() - nowMs) / 1000)) : 0;
     if (pet.walkTask.status === "walking" && remainSec > 0) {
-      setHint(`\u5b83\u6b63\u5728\u6563\u6b65\uff0c\u8fd8\u6709 ${remainSec}s \u5c31\u56de\u6765\u966a\u4f60\u3002`);
+      setHint(`它正在散步，还有 ${remainSec}s 就回来陪你。`);
       return;
     }
     if (pet.walkTask.lastDoneDayKey === today) {
-      setHint("\u4eca\u5929\u7684\u6563\u6b65\u4efb\u52a1\u5df2\u7ecf\u5b8c\u6210\u4e86\uff0c\u660e\u5929\u6211\u4eec\u518d\u6162\u6162\u51fa\u53d1\u3002");
+      setHint("今天的散步任务已经完成了，明天我们再慢慢出发。");
       return;
     }
     runAction(
@@ -644,8 +709,8 @@ export function SheepPetGarden() {
           },
           6
         ),
-      "\u5c0f\u7f8a\u5377\u51fa\u53d1\u53bb\u6563\u6b65\u4e86\uff0c30\u79d2\u540e\u4f1a\u5e26\u4e00\u4efd\u5c0f\u793c\u7269\u56de\u6765\u3002",
-      { icon: "\ud83d\udeb6", text: "\u4f60\u4eec\u5f00\u59cb\u4e86\u4e00\u6b21\u8f7b\u8f7b\u7684\u6563\u6b65\u4efb\u52a1\u3002" }
+      "小羊卷出发去散步了，30 秒后会带一份小礼物回来。",
+      { icon: "🚶", text: "你们开始了一次轻轻的散步任务。" }
     );
     setWalkCountdown(WALK_SECONDS);
   };
@@ -653,24 +718,24 @@ export function SheepPetGarden() {
   const syncLuckyColor = () => {
     const colorId = todayLuckyColorId();
     if (!colorId) {
-      setHint("\u4eca\u5929\u8fd8\u6ca1\u6709\u62bd\u989c\u8272\uff0c\u53ef\u4ee5\u5148\u53bb\u8f6c\u76d8\u770b\u770b\u3002");
+      setHint("今天还没有抽颜色，可以先去转盘看看。");
       return;
     }
 
     runAction(
       "pet",
       (s) => gainXp({ ...s, favoriteColorId: colorId, mood: clamp(s.mood + 12) }, 18),
-      "\u5c0f\u7f8a\u5377\u6362\u4e0a\u4e86\u4eca\u5929\u7684\u989c\u8272\u56f4\u5dfe\uff0c\u770b\u8d77\u6765\u5f88\u5f00\u5fc3\u3002",
-      { icon: "\ud83c\udf08", text: "\u4f60\u4eec\u5b8c\u6210\u4e86\u4eca\u65e5\u989c\u8272\u7684\u5c0f\u5c0f\u540c\u6b65\u3002" }
+      "小羊卷换上了今天的颜色围巾，看起来很开心。",
+      { icon: "🌈", text: "你们完成了今日颜色的小小同步。" }
     );
   };
 
   const walkStatusText =
     pet.walkTask.status === "walking"
-      ? `\u6563\u6b65\u4e2d... ${walkCountdown}s`
+      ? `散步中... ${walkCountdown}s`
       : pet.walkTask.lastDoneDayKey === formatDayKey(new Date())
-        ? "\u4eca\u65e5\u5df2\u5b8c\u6210"
-        : "\u672a\u5f00\u59cb";
+        ? "今日已完成"
+        : "未开始";
   const walkProgress =
     pet.walkTask.status === "walking"
       ? Math.round(((WALK_SECONDS - Math.max(0, walkCountdown)) / WALK_SECONDS) * 100)
@@ -680,45 +745,50 @@ export function SheepPetGarden() {
 
   return (
     <section id="pet" className="section pet-card">
-      <h2>{"\u5c0f\u7f8a\u5377\u517b\u6210\u8231"}</h2>
-      <p className="pet-desc">
-        {"\u6bcf\u5929\u6765\u770b\u770b\u5c0f\u7f8a\u5377\uff0c\u5b83\u4f1a\u5728\u4f60\u7684\u966a\u4f34\u91cc\u6162\u6162\u957f\u5927\u3002\u70b9\u51fb\u53ef\u4ee5\u6478\u5934\uff0c\u957f\u6309\u53ef\u4ee5\u62b1\u62b1\u3002"}
-      </p>
+      <h2>小羊卷养成舱</h2>
+      <p className="pet-desc">每天来看看小羊卷，它会在你的陪伴里慢慢长大。点击可以摸头，长按可以抱抱。</p>
 
       <div className="pet-layout">
-        <div className="pet-avatar-box">
-          <p className="pet-presence"><i />{"\u5c0f\u7f8a\u5377\u5728\u8fd9\u91cc\u966a\u4f60"}</p>
+        <div ref={avatarBoxRef} className="pet-avatar-box">
+          <p className="pet-presence"><i />小羊卷在这里陪你</p>
           <div key={bubbleTick} className="pet-bubble pet-bubble-live">{bubbleText}</div>
           <button
             type="button"
-            className={`pet-avatar pet-${petAction}`}
-            style={{ ["--accent" as string]: favoriteColor?.hex ?? "#ffd93d" }}
+            className={`pet-avatar pet-${petAction} pet-state-${presenceState}`}
+            style={{
+              ["--accent" as string]: favoriteColor?.hex ?? "#ffd93d",
+              ["--look-x" as string]: `${lookOffset.x}`,
+              ["--look-y" as string]: `${lookOffset.y}`
+            }}
             onMouseEnter={onAvatarHover}
             onFocus={onAvatarHover}
             onMouseDown={startHold}
             onMouseUp={cancelHold}
-            onMouseLeave={cancelHold}
+            onMouseLeave={() => {
+              cancelHold();
+              dispatchPresence("POINTER_LEAVE");
+            }}
             onTouchStart={startHold}
             onTouchEnd={cancelHold}
             onTouchCancel={cancelHold}
             onClick={onAvatarClick}
-            aria-label={"\u6478\u6478\u5c0f\u7f8a\u5377"}
+            aria-label="摸摸小羊卷"
           >
             {reaction ? <span className="pet-reaction">{reaction}</span> : null}
             <svg viewBox="0 0 240 190" role="img" aria-label="sheep-roll">
               <ellipse cx="120" cy="108" rx="84" ry="62" fill="#fff" stroke="#e5ecf7" strokeWidth="4" />
               <circle cx="78" cy="78" r="16" fill="#f7f1e8" className="pet-ear pet-ear-left" />
               <circle cx="162" cy="78" r="16" fill="#f7f1e8" className="pet-ear pet-ear-right" />
-              <circle cx="120" cy="108" r="42" fill="#fdfbf7" stroke="#edf2fb" strokeWidth="3" />
+              <circle cx="120" cy="108" r="42" fill="#fdfbf7" stroke="#edf2fb" strokeWidth="3" className="pet-face" />
               {eyesClosed ? (
                 <>
-                  <path d="M101 102 L111 102" stroke="#1f2a44" strokeWidth="3" strokeLinecap="round" />
-                  <path d="M129 102 L139 102" stroke="#1f2a44" strokeWidth="3" strokeLinecap="round" />
+                  <path d="M101 102 L111 102" stroke="#1f2a44" strokeWidth="3" strokeLinecap="round" className="pet-eye-lid" />
+                  <path d="M129 102 L139 102" stroke="#1f2a44" strokeWidth="3" strokeLinecap="round" className="pet-eye-lid" />
                 </>
               ) : (
                 <>
-                  <circle cx="106" cy="102" r="4" fill="#1f2a44" className="pet-eye" />
-                  <circle cx="134" cy="102" r="4" fill="#1f2a44" className="pet-eye" />
+                  <circle cx="106" cy="102" r="4" fill="#1f2a44" className="pet-eye pet-eye-left" />
+                  <circle cx="134" cy="102" r="4" fill="#1f2a44" className="pet-eye pet-eye-right" />
                 </>
               )}
               {smileWide ? (
@@ -740,42 +810,42 @@ export function SheepPetGarden() {
 
         <div className="pet-panel">
           <div className="pet-meter">
-            <span>{"\u7ecf\u9a8c"}</span>
+            <span>经验</span>
             <div><i style={{ width: `${xpPercent}%` }} /></div>
             <b>{pet.xp}/{LEVEL_XP}</b>
           </div>
           <div className="pet-meter">
-            <span>{"\u5fc3\u60c5"}</span>
+            <span>心情</span>
             <div><i style={{ width: `${pet.mood}%` }} /></div>
             <b>{pet.mood}</b>
           </div>
           <div className="pet-meter">
-            <span>{"\u9965\u997f"}</span>
+            <span>饥饿</span>
             <div><i style={{ width: `${hungerValue}%` }} /></div>
             <b>{hungerValue}</b>
           </div>
           <div className="pet-meter">
-            <span>{"\u7cbe\u529b"}</span>
+            <span>精力</span>
             <div><i style={{ width: `${energyValue}%` }} /></div>
             <b>{energyValue}</b>
           </div>
           <div className="pet-meter">
-            <span>{"\u6f54\u51c0"}</span>
+            <span>洁净</span>
             <div><i style={{ width: `${cleanValue}%` }} /></div>
             <b>{cleanValue}</b>
           </div>
 
           <div className="pet-actions">
-            <button type="button" onClick={feed}>{"\u5582\u98df"}</button>
-            <button type="button" onClick={play}>{"\u966a\u5b83\u73a9"}</button>
-            <button type="button" onClick={rest}>{"\u4f11\u606f"}</button>
-            <button type="button" onClick={groom}>{"\u68b3\u6bdb"}</button>
-            <button type="button" onClick={startWalkTask}>{"\u53bb\u6563\u4e2a\u6b65"}</button>
-            <button type="button" className="pet-lucky" onClick={syncLuckyColor}>{"\u540c\u6b65\u4eca\u65e5\u989c\u8272"}</button>
+            <button type="button" onClick={feed}>喂食</button>
+            <button type="button" onClick={play}>陪它玩</button>
+            <button type="button" onClick={rest}>休息</button>
+            <button type="button" onClick={groom}>梳毛</button>
+            <button type="button" onClick={startWalkTask}>去散个步</button>
+            <button type="button" className="pet-lucky" onClick={syncLuckyColor}>同步今日颜色</button>
           </div>
 
           <div className="pet-walk-row">
-            <b>{"\u4efb\u52a1\u72b6\u6001"}</b>
+            <b>任务状态</b>
             <span>{walkStatusText}</span>
           </div>
           <div className="pet-walk-progress">
@@ -784,7 +854,7 @@ export function SheepPetGarden() {
 
           {pet.souvenirs.length > 0 ? (
             <div className="pet-souvenirs">
-              <b>{"\u5c0f\u7eaa\u5ff5\u54c1"}</b>
+              <b>小纪念品</b>
               <div>
                 {pet.souvenirs.map((item, idx) => (
                   <span key={`${item}-${idx}`}>{item}</span>
@@ -796,7 +866,7 @@ export function SheepPetGarden() {
           <p className="pet-hint">{hint}</p>
 
           <div className="pet-timeline">
-            <b>{"\u4eca\u65e5\u56de\u5fc6"}</b>
+            <b>今日回忆</b>
             <ul>
               {pet.memories.slice(0, 5).map((m) => (
                 <li key={m.id}>
@@ -812,7 +882,3 @@ export function SheepPetGarden() {
     </section>
   );
 }
-
-
-
-

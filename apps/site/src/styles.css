@@ -1032,11 +1032,18 @@ h1 {
   .pet-actions .pet-lucky {
     grid-column: span 2;
   }
+
+  .pet-avatar {
+    --look-x: 0 !important;
+    --look-y: 0 !important;
+  }
 }
 
 .pet-avatar {
   position: relative;
   --accent: #ffd93d;
+  --look-x: 0;
+  --look-y: 0;
   width: 100%;
   border-radius: 12px;
   background: radial-gradient(circle at 20% 20%, #ffffff 0, #eef4ff 60%);
@@ -1046,6 +1053,29 @@ h1 {
   animation: petBreath 2.8s ease-in-out infinite, petFloat 6.4s ease-in-out infinite;
   touch-action: manipulation;
   transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.18s ease;
+}
+
+.pet-avatar .pet-face,
+.pet-avatar .pet-mouth {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pet-avatar .pet-face {
+  transform: translate(calc(var(--look-x) * 1.8px), calc(var(--look-y) * 1.5px));
+  transition: transform 0.26s ease;
+}
+
+.pet-eye-left {
+  transform: translate(calc(var(--look-x) * 1.2px), calc(var(--look-y) * 0.9px));
+}
+
+.pet-eye-right {
+  transform: translate(calc(var(--look-x) * 1.2px), calc(var(--look-y) * 0.9px));
+}
+
+.pet-eye-lid {
+  transform: translate(calc(var(--look-x) * 1.2px), calc(var(--look-y) * 0.8px));
 }
 
 .pet-avatar:hover {
@@ -1118,6 +1148,36 @@ h1 {
 
 .pet-look {
   animation: petLook 0.7s ease;
+}
+
+.pet-state-enter {
+  animation: petEnter 0.85s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.pet-state-notice {
+  animation: petNotice 1.1s ease;
+}
+
+.pet-state-curious {
+  animation: petCurious 1.25s ease;
+}
+
+.pet-state-happy {
+  animation: petHappy 1.5s ease;
+}
+
+.pet-state-comfort {
+  animation-duration: 4.8s, 8.5s;
+  filter: saturate(0.96);
+}
+
+.pet-state-sleepy {
+  animation-duration: 5.6s, 10s;
+  filter: saturate(0.92);
+}
+
+.pet-state-farewell {
+  animation: petFarewell 1s ease;
 }
 
 @keyframes petBreath {
@@ -1208,6 +1268,48 @@ h1 {
   0%, 100% { transform: rotate(0deg); }
   35% { transform: rotate(-2deg); }
   75% { transform: rotate(2deg); }
+}
+
+@keyframes petEnter {
+  0% { opacity: 0.2; transform: translateY(12px) scale(0.95); }
+  60% { opacity: 1; transform: translateY(-2px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes petNotice {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-4px) scale(1.012); }
+  70% { transform: translateY(-1px) scale(1.005); }
+}
+
+@keyframes petCurious {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  26% { transform: rotate(-1.8deg) translateY(-2px); }
+  58% { transform: rotate(1.8deg) translateY(-1px); }
+}
+
+@keyframes petHappy {
+  0%, 100% { transform: translateY(0) scale(1); }
+  24% { transform: translateY(-10px) scale(1.018); }
+  42% { transform: translateY(-3px) scale(1.006); }
+  68% { transform: translateY(-7px) scale(1.014); }
+}
+
+@keyframes petFarewell {
+  0%, 100% { transform: rotate(0deg); opacity: 1; }
+  35% { transform: rotate(-2deg); }
+  70% { transform: rotate(2deg); opacity: 0.96; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-avatar,
+  .pet-eye,
+  .pet-ear,
+  .pet-mouth,
+  .pet-bubble-live {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* Gentle Visual System Polish */
