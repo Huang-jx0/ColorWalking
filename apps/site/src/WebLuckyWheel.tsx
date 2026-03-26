@@ -9,7 +9,9 @@ import { useMemo, useState } from "react";
 
 const HISTORY_KEY = "colorwalking.web.history.v1";
 const RITUAL_KEY = "colorwalking.web.ritual.v1";
-const BASE_ROUNDS = 8;
+const DRAW_PENDING_EVENT = "colorwalking:draw-pending";
+const DRAW_UPDATED_EVENT = "colorwalking:draw-updated";
+const BASE_ROUNDS = 10;
 
 type DrawMode = "random" | "daily";
 type RitualState = "idle" | "spinning" | "revealing";
@@ -20,20 +22,20 @@ type RitualStore = {
 };
 
 const RITUAL_LINES = [
-  "把今天交给一点颜色，也交给自己一点松弛。",
-  "慢一点没关系，先让心情有个落点。",
-  "这不是答案，只是一份轻轻的提醒。"
+  "把今天交给一抹颜色，也交给自己一口慢呼吸。",
+  "不用急着变好，先给心情一个轻轻落点。",
+  "转盘不是答案，是一份柔软的小提醒。"
 ] as const;
 
 const COLOR_CARE: Record<string, string> = {
-  "sunrise-coral": "今天适合先照顾自己的情绪，再照顾效率。",
-  "golden-spark": "把注意力放在一件小事上，就已经很了不起。",
-  "mint-breath": "记得让呼吸慢下来，你不用一直绷着。",
+  "sunrise-coral": "今天适合先照顾心情，再处理效率。",
+  "golden-spark": "先把注意力放在一件小事上，就已经很了不起。",
+  "mint-breath": "慢慢呼吸，你不用一直绷着。",
   "river-blue": "遇到着急的事，先稳住节奏再做决定。",
-  "grape-night": "把担心写下来，心里会慢慢空出位置。",
+  "grape-night": "把担心写下来，心里会慢慢空一点。",
   "peach-mist": "对自己说话时，可以再温柔一点点。",
-  "sky-foam": "做一点轻盈的小尝试，不需要一开始就完美。",
-  "rose-dawn": "今天也值得被喜欢，哪怕只是一个瞬间。"
+  "sky-foam": "先做一点轻盈尝试，不必一开始就完美。",
+  "rose-dawn": "今天也值得被喜欢，哪怕只是一瞬间。"
 };
 
 function buildWheelGradient(): string {
@@ -86,7 +88,7 @@ function saveHistory(list: DrawResult[]) {
 
 function reminderByColor(result: DrawResult | null): string {
   if (!result) return "今天不用急着变好，先给自己一点好心情。";
-  return COLOR_CARE[result.color.id] ?? "今天也请你温柔地和自己站在同一边。";
+  return COLOR_CARE[result.color.id] ?? "今天也请温柔地和自己站在同一边。";
 }
 
 function loadTodayRitualResult(): DrawResult | null {
@@ -96,17 +98,45 @@ function loadTodayRitualResult(): DrawResult | null {
   return ritual.result;
 }
 
+async function copyTextFallback(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fallback to execCommand
+  }
+
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "true");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    ta.style.pointerEvents = "none";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 export function WebLuckyWheel() {
   const engine = useMemo(() => createDrawEngine(COLOR_PALETTE), []);
   const [mode, setMode] = useState<DrawMode>("daily");
   const [result, setResult] = useState<DrawResult | null>(() => loadTodayRitualResult());
   const [historyAll, setHistoryAll] = useState<DrawResult[]>(() => loadHistory());
   const [angle, setAngle] = useState(0);
-  const [spinMs, setSpinMs] = useState(3800);
+  const [spinMs, setSpinMs] = useState(4300);
   const [shareHint, setShareHint] = useState("");
   const [ritualState, setRitualState] = useState<RitualState>("idle");
   const [ritualLine, setRitualLine] = useState(
-    result ? "今天的颜色已经为你留好，点一下就能再次查看。" : "准备好就点一下，我们开始今天的小仪式。"
+    result ? "今天的颜色已为你准备好，点一下就能再看一次揭晓。" : "准备好就点一下，我们开始今天的小仪式。"
   );
   const [todayCached, setTodayCached] = useState(() => Boolean(loadTodayRitualResult()));
 
@@ -134,13 +164,13 @@ export function WebLuckyWheel() {
 
       const sector = 360 / engine.palette.length;
       const targetCenter = draw.index * sector + sector / 2;
-      const rounds = BASE_ROUNDS + Math.floor(Math.random() * 4);
-      const duration = 3400 + Math.floor(Math.random() * 900);
+      const rounds = BASE_ROUNDS + Math.floor(Math.random() * 5);
+      const duration = 4000 + Math.floor(Math.random() * 1200);
 
       setRitualState("spinning");
       setSpinMs(duration);
-      window.dispatchEvent(new CustomEvent("colorwalking:draw-pending"));
-      setRitualLine("小羊卷在转盘旁边等你，一起揭晓今天的颜色。");
+      window.dispatchEvent(new CustomEvent(DRAW_PENDING_EVENT));
+      setRitualLine("小羊卷在旁边等你，我们一起揭晓今天的颜色。");
       setShareHint("");
       window.requestAnimationFrame(() => {
         setAngle((prev) => prev - rounds * 360 - targetCenter);
@@ -148,7 +178,7 @@ export function WebLuckyWheel() {
 
       window.setTimeout(() => {
         setRitualState("revealing");
-        setRitualLine("结果出来啦，先收下这份只属于今天的温柔。");
+        setRitualLine("结果出来啦，收下这份只属于今天的温柔。");
         setResult(draw);
 
         const existingTodayIndex = historyAll.findIndex((x) => x.dayKey === draw.dayKey);
@@ -161,40 +191,56 @@ export function WebLuckyWheel() {
         nextHistory = nextHistory.slice(0, 100);
         setHistoryAll(nextHistory);
         saveHistory(nextHistory);
-        window.dispatchEvent(new CustomEvent("colorwalking:draw-updated", { detail: draw }));
+        window.dispatchEvent(new CustomEvent(DRAW_UPDATED_EVENT, { detail: draw }));
 
         window.setTimeout(() => {
           setRitualState("idle");
           const randomLine = RITUAL_LINES[Math.floor(Math.random() * RITUAL_LINES.length)] ?? RITUAL_LINES[0];
           setRitualLine(randomLine);
-        }, 460);
+        }, 520);
       }, duration);
     } catch {
       setRitualState("idle");
-      setRitualLine("这次没转起来，再点一下试试，我会陪着你。");
+      setRitualLine("这次没有顺利转起来，再点一下试试，我会陪着你。");
     }
   };
 
   const onShare = async () => {
     if (!result) return;
-    const text = `我在 ColorWalking 抽到今日幸运色：${result.color.name} ${result.color.hex}。`;
+    const text = `我在 ColorWalking 抽到今日幸运色：${result.color.name} ${result.color.hex}。${result.color.message}`;
     const url = window.location.href;
+    const merged = `${text}\n${url}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "ColorWalking 今日颜色", text, url });
+        await navigator.share({ title: "ColorWalking 今日幸运色", text, url });
         setShareHint("已打开分享面板");
       } else {
-        await navigator.clipboard.writeText(`${text} ${url}`);
-        setShareHint("已复制分享文案");
+        const ok = await copyTextFallback(merged);
+        if (ok) {
+          setShareHint("已复制分享文案");
+        } else {
+          window.prompt("复制这段内容去分享：", merged);
+          setShareHint("已为你准备好分享内容");
+        }
       }
-    } catch {
-      setShareHint("这次先不分享也没关系");
+    } catch (err) {
+      const maybeAbort = err instanceof Error && err.name === "AbortError";
+      if (maybeAbort) {
+        setShareHint("你取消了分享，没关系。");
+      } else {
+        const ok = await copyTextFallback(merged);
+        setShareHint(ok ? "分享面板不可用，已帮你复制。" : "这次先不分享也没关系。");
+      }
     }
-    window.setTimeout(() => setShareHint(""), 1800);
+    window.setTimeout(() => setShareHint(""), 2200);
   };
 
   const centerLabel =
-    ritualState === "spinning" ? "揭晓中" : mode === "daily" && todayCached ? "查看今日色" : "开始抽色";
+    ritualState === "spinning"
+      ? "揭晓中"
+      : mode === "daily" && todayCached
+        ? "再看今日色"
+        : "开始抽色";
 
   return (
     <section className="play-card">
@@ -225,6 +271,9 @@ export function WebLuckyWheel() {
       <div className="play-layout">
         <div className={spinning ? "wheel-wrap is-disabled" : "wheel-wrap"}>
           <div className="wheel-pointer" />
+          <div className={spinning ? "wheel-orbit is-spinning" : "wheel-orbit"}>
+            <i />
+          </div>
           <button
             type="button"
             className="wheel-hit"
@@ -236,7 +285,7 @@ export function WebLuckyWheel() {
             className="wheel"
             style={{
               transform: `rotate(${angle}deg)`,
-              transition: spinning ? `transform ${spinMs}ms cubic-bezier(0.12, 0.86, 0.18, 1)` : "none",
+              transition: spinning ? `transform ${spinMs}ms cubic-bezier(0.08, 0.86, 0.14, 1)` : "none",
               background: buildWheelGradient()
             }}
             aria-hidden="true"
@@ -291,3 +340,4 @@ export function WebLuckyWheel() {
     </section>
   );
 }
+

@@ -1,5 +1,6 @@
 import { COLOR_PALETTE } from "@colorwalking/shared";
 import { Suspense, lazy } from "react";
+import { FloatingSheepPet } from "./FloatingSheepPet";
 import { LuckyColorOracle } from "./LuckyColorOracle";
 import { SheepPetGarden } from "./SheepPetGarden";
 
@@ -111,6 +112,7 @@ export function App() {
         <p>{"\u00a9 2026 ColorWalking. \u613f\u4f60\u6bcf\u5929\u90fd\u6709\u4e00\u70b9\u88ab\u8f7b\u8f7b\u5b89\u6170\u5230\u7684\u65f6\u523b\u3002"}</p>
         <p className="version-badge">{"\u7248\u672c\u66f4\u65b0\uff1a"}{BUILD_TAG}</p>
       </footer>
+      <FloatingSheepPet />
     </div>
   );
 }

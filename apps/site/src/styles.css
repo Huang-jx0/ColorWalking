@@ -385,6 +385,32 @@ h1 {
   z-index: 3;
 }
 
+.wheel-orbit {
+  position: absolute;
+  inset: -8px;
+  z-index: 2;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.wheel-orbit i {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #8cb6ff 68%);
+  box-shadow: 0 0 14px rgba(90, 140, 240, 0.42);
+  opacity: 0.22;
+}
+
+.wheel-orbit.is-spinning i {
+  opacity: 0.95;
+  animation: wheelOrbitSpin 0.66s linear infinite;
+}
+
 .wheel {
   width: 100%;
   height: 100%;
@@ -425,6 +451,10 @@ h1 {
 .wheel-center:hover {
   transform: translate(-50%, -50%) scale(1.03);
   box-shadow: 0 14px 28px rgba(39, 84, 186, 0.34);
+}
+
+.wheel-center:disabled {
+  cursor: default;
 }
 
 .play-result {
@@ -1852,6 +1882,126 @@ select:focus-visible {
 
 .history-list code {
   opacity: 0.86;
+}
+
+@keyframes wheelOrbitSpin {
+  from { transform: rotate(0deg) translateY(-2px); }
+  to { transform: rotate(360deg) translateY(-2px); }
+}
+
+.floating-pet {
+  position: fixed;
+  right: 18px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.floating-pet-core {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  border: 1px solid #dbe6fa;
+  background: radial-gradient(circle at 28% 25%, #ffffff, #ecf3ff 64%);
+  box-shadow: 0 10px 24px rgba(46, 74, 126, 0.16);
+  display: block;
+  animation: floatingPetBreath 3.1s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+
+.floating-pet-core:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.floating-ear {
+  position: absolute;
+  top: 10px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #efe9dd;
+}
+
+.floating-ear.left { left: 11px; }
+.floating-ear.right { right: 11px; }
+
+.floating-face {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  margin-top: -10px;
+  border: 2px solid #dae3f5;
+  border-radius: 999px;
+}
+
+.floating-face i {
+  position: absolute;
+  top: 10px;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #1f2a44;
+}
+
+.floating-face i:first-child { left: 8px; }
+.floating-face i:last-child { right: 8px; }
+
+.floating-face b {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  width: 12px;
+  height: 6px;
+  margin-left: -6px;
+  border: 2px solid #1f2a44;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0 0 999px 999px;
+}
+
+.floating-bubble {
+  max-width: 220px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid #d8e5fb;
+  background: rgba(255, 255, 255, 0.95);
+  color: #4a5d82;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 8px 20px rgba(56, 82, 132, 0.12);
+}
+
+.floating-pet.is-awake .floating-pet-core {
+  animation: floatingPetExcited 1s ease;
+}
+
+@keyframes floatingPetBreath {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.02); }
+}
+
+@keyframes floatingPetExcited {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-5px) scale(1.04); }
+}
+
+@media (max-width: 860px) {
+  .floating-pet {
+    right: 12px;
+    bottom: 14px;
+  }
+
+  .floating-bubble {
+    max-width: 176px;
+    font-size: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
