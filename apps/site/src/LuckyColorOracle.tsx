@@ -9,6 +9,20 @@ import {
 
 const SIGN_STORE_KEY = "colorwalking.time-color-note.v1";
 
+type SavedSign = {
+  id: string;
+  savedAt: string;
+  birthday: string;
+  birthHour: number;
+  firstDate: string;
+  secondDate: string;
+  firstColorName: string;
+  firstColorHex: string;
+  secondColorName: string;
+  secondColorHex: string;
+  advice: string;
+};
+
 function todayText(offset = 0): string {
   const date = new Date();
   date.setDate(date.getDate() + offset);
@@ -42,20 +56,6 @@ const ELEMENT_ACTION: Record<FiveElement, string> = {
   water: "慢慢呼吸 6 次，再继续处理眼前的事情。"
 };
 
-type SavedSign = {
-  id: string;
-  savedAt: string;
-  birthday: string;
-  birthHour: number;
-  firstDate: string;
-  secondDate: string;
-  firstColorName: string;
-  firstColorHex: string;
-  secondColorName: string;
-  secondColorHex: string;
-  advice: string;
-};
-
 function loadSavedSigns(): SavedSign[] {
   try {
     const raw = localStorage.getItem(SIGN_STORE_KEY);
@@ -83,8 +83,46 @@ function compareTone(first: FortuneInsight, second: FortuneInsight): string {
 function bestDayHint(first: FortuneInsight, second: FortuneInsight): string {
   if (first.supportElement === second.supportElement) return "两天都适合你，按日程轻松安排就好。";
   return first.supportElement === first.luckyElement
-    ? `更推荐 ${first.dateKey}，这天更贴合你当下的状态。`
+    ? `更推荐 ${first.dateKey}，这天更贴合你当下状态。`
     : `更推荐 ${second.dateKey}，这天会更顺手一点。`;
+}
+
+async function copyTextFallback(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fallback to execCommand
+  }
+
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "true");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    ta.style.pointerEvents = "none";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+function buildSignShareText(sign: SavedSign): string {
+  return [
+    `我的时色签`,
+    `A 日 ${sign.firstDate}：${sign.firstColorName} ${sign.firstColorHex}`,
+    `B 日 ${sign.secondDate}：${sign.secondColorName} ${sign.secondColorHex}`,
+    `今日建议：${sign.advice}`,
+    `来自 ColorWalking`
+  ].join("\n");
 }
 
 function ResultCard({ title, item }: { title: string; item: FortuneInsight }) {
@@ -121,6 +159,7 @@ export function LuckyColorOracle() {
   const [firstDate, setFirstDate] = useState(todayText(0));
   const [secondDate, setSecondDate] = useState(todayText(1));
   const [savedHint, setSavedHint] = useState("");
+  const [shareHint, setShareHint] = useState("");
   const [savedPreview, setSavedPreview] = useState<SavedSign | null>(() => loadSavedSigns()[0] ?? null);
 
   const result = useMemo(() => {
@@ -131,9 +170,9 @@ export function LuckyColorOracle() {
 
   const todayAdvice = result ? ELEMENT_ACTION[result.first.luckyElement] : "";
 
-  const onSaveTodaySign = () => {
-    if (!result) return;
-    const sign: SavedSign = {
+  const createCurrentSign = (): SavedSign | null => {
+    if (!result) return null;
+    return {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       savedAt: new Date().toISOString(),
       birthday,
@@ -146,10 +185,52 @@ export function LuckyColorOracle() {
       secondColorHex: result.second.luckyColor.hex,
       advice: todayAdvice
     };
+  };
+
+  const onSaveTodaySign = () => {
+    const sign = createCurrentSign();
+    if (!sign) return;
     saveSign(sign);
     setSavedPreview(sign);
     setSavedHint(`已保存今日时色签（${formatDayKey(new Date())}）。`);
     window.setTimeout(() => setSavedHint(""), 2200);
+  };
+
+  const onShareTodaySign = async () => {
+    let sign = savedPreview;
+    if (!sign) {
+      sign = createCurrentSign();
+      if (sign) {
+        saveSign(sign);
+        setSavedPreview(sign);
+      }
+    }
+    if (!sign) return;
+
+    const text = buildSignShareText(sign);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "时色签", text, url: window.location.href });
+        setShareHint("已打开分享面板");
+      } else {
+        const ok = await copyTextFallback(`${text}\n${window.location.href}`);
+        if (ok) {
+          setShareHint("已复制时色签文案");
+        } else {
+          window.prompt("复制这段时色签：", `${text}\n${window.location.href}`);
+          setShareHint("已为你准备好分享内容");
+        }
+      }
+    } catch (err) {
+      const abort = err instanceof Error && err.name === "AbortError";
+      if (abort) {
+        setShareHint("你取消了分享，没关系。");
+      } else {
+        const ok = await copyTextFallback(`${text}\n${window.location.href}`);
+        setShareHint(ok ? "分享面板不可用，已帮你复制。" : "这次先不分享也没关系。");
+      }
+    }
+    window.setTimeout(() => setShareHint(""), 2200);
   };
 
   return (
@@ -200,7 +281,9 @@ export function LuckyColorOracle() {
             <p className="oracle-best-day">{bestDayHint(result.first, result.second)}</p>
             <div className="oracle-sign-actions">
               <button type="button" className="oracle-save-btn" onClick={onSaveTodaySign}>保存今日时色签</button>
+              <button type="button" className="oracle-share-btn" onClick={onShareTodaySign}>分享今日时色签</button>
               {savedHint ? <em>{savedHint}</em> : null}
+              {shareHint ? <em>{shareHint}</em> : null}
             </div>
           </div>
           <div className="oracle-results-grid">

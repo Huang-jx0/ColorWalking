@@ -740,6 +740,22 @@ h1 {
   box-shadow: 0 8px 18px rgba(67, 110, 204, 0.24);
 }
 
+.oracle-share-btn {
+  border: 1px solid #d4e0f7;
+  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+  color: #35507d;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.oracle-share-btn:hover {
+  transform: translateY(-1px);
+  border-color: #bfd4f8;
+  box-shadow: 0 7px 16px rgba(63, 99, 162, 0.15);
+}
+
 .oracle-sign-actions em {
   font-style: normal;
   color: #4f648c;
