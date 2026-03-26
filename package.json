@@ -10,7 +10,9 @@
     "dev:mobile": "npm --workspace @colorwalking/mobile run start",
     "dev:site": "npm --workspace @colorwalking/site run dev",
     "build:site": "npm --workspace @colorwalking/site run build",
-    "sync:sheep": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-sheep-appearance.ps1"
+    "sync:sheep": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-sheep-appearance.ps1",
+    "sync:pull": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-pull.ps1",
+    "sync:push": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-push.ps1"
   },
   "packageManager": "pnpm@9.15.5+sha512.845196026aab1cc3f098a0474b64dfbab2afe7a1b4e91dd86895d8e4aa32a7a6d03049e2d0ad770bbe4de023a7122fb68c1a1d6e0d033c7076085f9d5d4800d4"
 }

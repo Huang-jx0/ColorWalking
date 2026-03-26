@@ -25,6 +25,20 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-site.ps1
   - Output Directory: `dist`
   - Install Command: `pnpm install --frozen-lockfile`
 
+## 双地办公快速同步（公司/家里）
+- 回家开工前先拉最新：
+```powershell
+npm run sync:pull
+```
+- 在任意地点改完后一键提交并推送：
+```powershell
+npm run sync:push
+```
+- 需要自定义提交信息时：
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-push.ps1 -Message "feat: your message"
+```
+
 ## 原创保护
 本项目视觉、文案、品牌设定（含“五彩斑斓的小羊卷”）默认归 ColorWalking 项目版权所有。
 详见 `COPYRIGHT.md`。
