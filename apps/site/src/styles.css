@@ -353,6 +353,12 @@ h1 {
   width: 320px;
   height: 320px;
   margin: 0 auto;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.wheel-wrap.is-disabled {
+  cursor: not-allowed;
 }
 
 .wheel-pointer {
@@ -376,6 +382,7 @@ h1 {
   border: 8px solid #fff;
   box-shadow: 0 10px 28px rgba(31, 42, 68, 0.12);
   cursor: pointer;
+  pointer-events: none;
 }
 
 .wheel-center {

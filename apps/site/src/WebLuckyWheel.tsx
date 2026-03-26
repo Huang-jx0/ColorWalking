@@ -5,7 +5,7 @@ import {
   formatDayKey,
   type DrawResult
 } from "@colorwalking/shared";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 
 const HISTORY_KEY = "colorwalking.web.history.v1";
 const RITUAL_KEY = "colorwalking.web.ritual.v1";
@@ -80,7 +80,7 @@ function saveHistory(list: DrawResult[]) {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
   } catch {
-    // ignore storage errors to keep draw interaction usable
+    // ignore storage errors
   }
 }
 
@@ -190,6 +190,19 @@ export function WebLuckyWheel() {
   const centerLabel =
     ritualState === "spinning" ? "揭晓中" : mode === "daily" && todayCached ? "查看今日色" : "开始抽色";
 
+  const onWheelWrapClick = () => {
+    if (spinning) return;
+    onSpin();
+  };
+
+  const onWheelWrapKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (spinning) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSpin();
+    }
+  };
+
   return (
     <section className="play-card">
       <h2>网页转盘</h2>
@@ -217,12 +230,22 @@ export function WebLuckyWheel() {
       </button>
 
       <div className="play-layout">
-        <div className="wheel-wrap">
+        <div
+          className={spinning ? "wheel-wrap is-disabled" : "wheel-wrap"}
+          role="button"
+          aria-label="点击转盘区域抽取幸运色"
+          tabIndex={spinning ? -1 : 0}
+          onClick={onWheelWrapClick}
+          onKeyDown={onWheelWrapKeyDown}
+        >
           <div className="wheel-pointer" />
           <button
             type="button"
             className="wheel"
-            onClick={onSpin}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSpin();
+            }}
             style={{
               transform: `rotate(${angle}deg)`,
               transition: spinning ? "transform 2.2s cubic-bezier(0.19, 0.95, 0.2, 1)" : "none",
@@ -231,7 +254,15 @@ export function WebLuckyWheel() {
             aria-label="点击转盘抽取幸运色"
             disabled={spinning}
           />
-          <button type="button" className="wheel-center" onClick={onSpin} disabled={spinning}>
+          <button
+            type="button"
+            className="wheel-center"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSpin();
+            }}
+            disabled={spinning}
+          >
             {centerLabel}
           </button>
         </div>
