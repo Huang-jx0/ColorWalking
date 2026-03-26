@@ -2071,10 +2071,19 @@ select:focus-visible {
   animation: floatingPetHappy 0.95s ease;
 }
 
-.pixel-sheep {
+.floating-pet .pixel-sheep {
   width: 64px;
   height: 64px;
   margin: 6px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.pet-main-sprite {
+  width: min(100%, 236px);
+  height: auto;
+  margin: 10px auto 0;
+  display: block;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }

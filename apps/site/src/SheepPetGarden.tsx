@@ -5,6 +5,7 @@ import { nextPresenceState, presenceStateDurationMs } from "./pet/stateMachine";
 import { canTrigger, randomInRange } from "./pet/timing";
 import type { MessageBucket, PetPresenceEvent, PetPresenceState } from "./pet/types";
 import { usePetPresence } from "./pet/usePetPresence";
+import { PixelSheepSprite, type PixelSheepFrame } from "./PixelSheepSprite";
 
 type PetMemory = {
   id: string;
@@ -294,6 +295,32 @@ function latestWheelDraw(): WheelHistoryItem | null {
   }
 }
 
+function frameByGardenState(action: PetAction, presence: PetPresenceState, emotion: PetEmotion, tick: number): PixelSheepFrame {
+  if (action === "feed") return tick % 2 === 0 ? "notice_a" : "notice_b";
+  if (action === "play") return ["jump_a", "jump_b", "jump_c"][tick % 3] as PixelSheepFrame;
+  if (action === "rest") return tick % 2 === 0 ? "sleepy_a" : "sleepy_b";
+  if (action === "groom") return tick % 2 === 0 ? "idle_a" : "blink_a";
+  if (action === "pet") return tick % 2 === 0 ? "happy_a" : "happy_b";
+  if (action === "cuddle") return "comfort_a";
+  if (action === "hop") return ["jump_a", "jump_b", "jump_c"][tick % 3] as PixelSheepFrame;
+  if (action === "yawn") return tick % 2 === 0 ? "sleepy_a" : "sleepy_b";
+  if (action === "look") return tick % 2 === 0 ? "turn_left" : "turn_right";
+
+  if (presence === "enter") return tick % 2 === 0 ? "notice_a" : "notice_b";
+  if (presence === "notice") return tick % 2 === 0 ? "notice_a" : "notice_b";
+  if (presence === "curious") return "curious_a";
+  if (presence === "happy") return tick % 2 === 0 ? "happy_a" : "happy_b";
+  if (presence === "sleepy") return tick % 2 === 0 ? "sleepy_a" : "sleepy_b";
+  if (presence === "comfort") return "comfort_a";
+  if (presence === "farewell") return "back_look";
+
+  if (emotion === "sleepy") return tick % 2 === 0 ? "sleepy_a" : "sleepy_b";
+  if (emotion === "upset") return "comfort_a";
+  if (emotion === "needy") return tick % 2 === 0 ? "turn_left" : "turn_right";
+  if (emotion === "bored") return tick % 2 === 0 ? "curious_a" : "turn_right";
+  return ["idle_a", "idle_b", "blink_a", "idle_b", "blink_b"][tick % 5] as PixelSheepFrame;
+}
+
 export function SheepPetGarden() {
   const [pet, setPet] = useState<PetState>(() => loadPet());
   const [hint, setHint] = useState("欢迎来到小羊卷的小屋，每天来看看它一次，它会慢慢更依赖你。");
@@ -303,6 +330,7 @@ export function SheepPetGarden() {
   const [reaction, setReaction] = useState("");
   const [walkCountdown, setWalkCountdown] = useState(0);
   const [presenceState, setPresenceState] = useState<PetPresenceState>("enter");
+  const [spriteTick, setSpriteTick] = useState(0);
 
   const petPresenceRef = useRef<PetPresenceState>("enter");
   const messagePickerRef = useRef(createMessagePicker(6));
@@ -325,8 +353,10 @@ export function SheepPetGarden() {
   const hungerValue = Math.round(pet.hunger);
   const energyValue = Math.round(pet.energy);
   const cleanValue = Math.round(pet.cleanliness);
-  const eyesClosed = pet.energy < 22;
-  const smileWide = pet.mood >= 70;
+  const petFrame = useMemo(
+    () => frameByGardenState(petAction, presenceState, emotion, spriteTick),
+    [petAction, presenceState, emotion, spriteTick]
+  );
 
   const speak = useCallback(
     (bucket: MessageBucket, options?: { force?: boolean; setHintText?: boolean }): string => {
@@ -346,6 +376,11 @@ export function SheepPetGarden() {
     },
     []
   );
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setSpriteTick((v) => v + 1), 500);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const triggerAction = useCallback((action: PetAction) => {
     setPetAction(action);
@@ -775,31 +810,7 @@ export function SheepPetGarden() {
             aria-label="摸摸小羊卷"
           >
             {reaction ? <span className="pet-reaction">{reaction}</span> : null}
-            <svg viewBox="0 0 240 190" role="img" aria-label="sheep-roll">
-              <ellipse cx="120" cy="108" rx="84" ry="62" fill="#fff" stroke="#e5ecf7" strokeWidth="4" />
-              <circle cx="78" cy="78" r="16" fill="#f7f1e8" className="pet-ear pet-ear-left" />
-              <circle cx="162" cy="78" r="16" fill="#f7f1e8" className="pet-ear pet-ear-right" />
-              <circle cx="120" cy="108" r="42" fill="#fdfbf7" stroke="#edf2fb" strokeWidth="3" className="pet-face" />
-              {eyesClosed ? (
-                <>
-                  <path d="M101 102 L111 102" stroke="#1f2a44" strokeWidth="3" strokeLinecap="round" className="pet-eye-lid" />
-                  <path d="M129 102 L139 102" stroke="#1f2a44" strokeWidth="3" strokeLinecap="round" className="pet-eye-lid" />
-                </>
-              ) : (
-                <>
-                  <circle cx="106" cy="102" r="4" fill="#1f2a44" className="pet-eye pet-eye-left" />
-                  <circle cx="134" cy="102" r="4" fill="#1f2a44" className="pet-eye pet-eye-right" />
-                </>
-              )}
-              {smileWide ? (
-                <path d="M102 120 Q120 142 138 120" fill="none" stroke="#1f2a44" strokeWidth="4" strokeLinecap="round" className="pet-mouth" />
-              ) : (
-                <path d="M106 124 Q120 132 134 124" fill="none" stroke="#1f2a44" strokeWidth="4" strokeLinecap="round" className="pet-mouth" />
-              )}
-              <path d="M63 52 C90 24, 150 24, 177 52" fill="none" stroke="var(--accent)" strokeWidth="7" strokeLinecap="round" />
-              <path d="M95 56 C104 47, 113 47, 122 56" fill="none" stroke="#7db5ff" strokeWidth="5" strokeLinecap="round" />
-              <path d="M118 58 C127 49, 136 49, 145 58" fill="none" stroke="#ffd76f" strokeWidth="5" strokeLinecap="round" />
-            </svg>
+            <PixelSheepSprite frame={petFrame} scarfColor={favoriteColor?.hex ?? "#7ea9df"} size={176} className="pet-main-sprite" />
           </button>
           <p className="pet-name">{pet.name} · Lv.{pet.level}</p>
           <p className="pet-status">

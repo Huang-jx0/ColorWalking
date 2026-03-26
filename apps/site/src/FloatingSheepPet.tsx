@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { formatDayKey } from "@colorwalking/shared";
-import { PixelSheepSprite } from "./PixelSheepSprite";
+import { PixelSheepSprite, type PixelSheepFrame } from "./PixelSheepSprite";
 
 type WheelDetail = {
   color?: { name?: string };
@@ -78,8 +78,14 @@ export function FloatingSheepPet() {
   const [scarfColor, setScarfColor] = useState(() => readTodayScarfColor());
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [hop, setHop] = useState(false);
+  const [tick, setTick] = useState(0);
 
   const ctaLabel = useMemo(() => (hasTodayColor ? "去看看小羊卷" : "去抽今日幸运色"), [hasTodayColor]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setTick((v) => v + 1), 480);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const today = formatDayKey(new Date());
@@ -227,6 +233,21 @@ export function FloatingSheepPet() {
     scrollToId(target);
   };
 
+  const frame: PixelSheepFrame = useMemo(() => {
+    if (hop) {
+      const jump = ["jump_a", "jump_b", "jump_c"] as const;
+      return jump[tick % jump.length];
+    }
+    if (mood === "enter") return tick % 2 === 0 ? "notice_a" : "notice_b";
+    if (mood === "expecting") return tick % 2 === 0 ? "expecting_a" : "expecting_b";
+    if (mood === "happy") return tick % 2 === 0 ? "happy_a" : "happy_b";
+    if (mood === "comfort") return tick % 2 === 0 ? "comfort_a" : "sleepy_a";
+    if (mood === "notice") return tick % 2 === 0 ? "notice_a" : "notice_b";
+    if (near) return tick % 2 === 0 ? "curious_a" : "turn_right";
+    const idle = ["idle_a", "idle_b", "blink_a", "idle_b", "blink_b"] as const;
+    return idle[tick % idle.length];
+  }, [mood, tick, near, hop]);
+
   return (
     <div
       ref={rootRef}
@@ -236,7 +257,7 @@ export function FloatingSheepPet() {
     >
       <div className="floating-pet-label">{ctaLabel}</div>
       <a className="floating-pet-core" href={hasTodayColor ? "#pet" : "#play"} onClick={onClick}>
-        <PixelSheepSprite mood={mood} scarfColor={scarfColor} />
+        <PixelSheepSprite frame={frame} scarfColor={scarfColor} />
       </a>
       <div className="floating-bubble">{bubble}</div>
     </div>
