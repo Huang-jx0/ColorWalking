@@ -1356,7 +1356,6 @@ h1 {
 
 .cta:hover,
 .share-btn:hover,
-.wheel-center:hover,
 .pet-actions .pet-lucky:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(71, 119, 222, 0.32);

@@ -226,30 +226,16 @@ export function WebLuckyWheel() {
             aria-label="点击转盘区域抽取幸运色"
             disabled={spinning}
           />
-          <button
-            type="button"
+          <div
             className="wheel"
-            onClick={(e) => {
-              e.preventDefault();
-              onSpin();
-            }}
             style={{
               transform: `rotate(${angle}deg)`,
               transition: spinning ? "transform 2.2s cubic-bezier(0.19, 0.95, 0.2, 1)" : "none",
               background: buildWheelGradient()
             }}
-            aria-label="点击转盘抽取幸运色"
-            disabled={spinning}
+            aria-hidden="true"
           />
-          <button
-            type="button"
-            className="wheel-center"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSpin();
-            }}
-            disabled={spinning}
-          >
+          <button type="button" className="wheel-center" onClick={onSpin} disabled={spinning}>
             {centerLabel}
           </button>
         </div>
