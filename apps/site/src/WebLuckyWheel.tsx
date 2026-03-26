@@ -212,6 +212,9 @@ export function WebLuckyWheel() {
           随机模式
         </button>
       </div>
+      <button type="button" className="ghost-btn draw-helper-btn" onClick={onSpin} disabled={spinning}>
+        {spinning ? "正在揭晓..." : "点这里也能抽色"}
+      </button>
 
       <div className="play-layout">
         <div className="wheel-wrap">

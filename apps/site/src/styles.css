@@ -1359,6 +1359,11 @@ h1 {
   color: #315998;
 }
 
+.draw-helper-btn {
+  margin-top: 6px;
+  min-height: 40px;
+}
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -1531,6 +1536,12 @@ select:focus-visible {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+  }
+
+  .draw-helper-btn {
+    width: 100%;
+    margin-top: 8px;
+    text-align: center;
   }
 
   .mode-btn {
