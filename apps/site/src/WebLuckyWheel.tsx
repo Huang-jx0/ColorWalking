@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 
 const HISTORY_KEY = "colorwalking.web.history.v1";
 const RITUAL_KEY = "colorwalking.web.ritual.v1";
-const EXTRA_ROUNDS = 6;
+const BASE_ROUNDS = 8;
 
 type DrawMode = "random" | "daily";
 type RitualState = "idle" | "spinning" | "revealing";
@@ -102,6 +102,7 @@ export function WebLuckyWheel() {
   const [result, setResult] = useState<DrawResult | null>(() => loadTodayRitualResult());
   const [historyAll, setHistoryAll] = useState<DrawResult[]>(() => loadHistory());
   const [angle, setAngle] = useState(0);
+  const [spinMs, setSpinMs] = useState(3800);
   const [shareHint, setShareHint] = useState("");
   const [ritualState, setRitualState] = useState<RitualState>("idle");
   const [ritualLine, setRitualLine] = useState(
@@ -133,12 +134,15 @@ export function WebLuckyWheel() {
 
       const sector = 360 / engine.palette.length;
       const targetCenter = draw.index * sector + sector / 2;
+      const rounds = BASE_ROUNDS + Math.floor(Math.random() * 4);
+      const duration = 3400 + Math.floor(Math.random() * 900);
 
       setRitualState("spinning");
+      setSpinMs(duration);
       setRitualLine("小羊卷在转盘旁边等你，一起揭晓今天的颜色。");
       setShareHint("");
       window.requestAnimationFrame(() => {
-        setAngle((prev) => prev - EXTRA_ROUNDS * 360 - targetCenter);
+        setAngle((prev) => prev - rounds * 360 - targetCenter);
       });
 
       window.setTimeout(() => {
@@ -163,7 +167,7 @@ export function WebLuckyWheel() {
           const randomLine = RITUAL_LINES[Math.floor(Math.random() * RITUAL_LINES.length)] ?? RITUAL_LINES[0];
           setRitualLine(randomLine);
         }, 460);
-      }, 2200);
+      }, duration);
     } catch {
       setRitualState("idle");
       setRitualLine("这次没转起来，再点一下试试，我会陪着你。");
@@ -231,7 +235,7 @@ export function WebLuckyWheel() {
             className="wheel"
             style={{
               transform: `rotate(${angle}deg)`,
-              transition: spinning ? "transform 2.2s cubic-bezier(0.19, 0.95, 0.2, 1)" : "none",
+              transition: spinning ? `transform ${spinMs}ms cubic-bezier(0.12, 0.86, 0.18, 1)` : "none",
               background: buildWheelGradient()
             }}
             aria-hidden="true"
