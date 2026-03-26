@@ -41,23 +41,26 @@ type TurnMode = "front" | "left" | "right" | "back" | "back_look";
 type ExpressionMode = "calm" | "softHappy" | "softCurious";
 
 const PALETTE = {
-  woolTop: "#fffdf8",
-  woolMid: "#fbf9f4",
-  woolShade: "#efeae0",
-  woolShadeDeep: "#e5dfd4",
-  woolRim: "#d7e0ed",
-  lineFace: "#d5deea",
-  lineOuter: "#cfd9e8",
-  lineSoft: "#dce5f2",
-  earOuter: "#f6f1e8",
-  earInner: "#f6d9df",
-  eye: "#24324f",
-  eyeLight: "#8aa2c9",
-  blush: "#f6bbc8",
-  blushSoft: "#f9d7de",
+  woolTop: "#fffefb",
+  woolMid: "#fefbf6",
+  woolShade: "#f2ece2",
+  woolShadeDeep: "#e8dfd1",
+  woolRim: "#d9e3f2",
+  lineFace: "#d6e0ee",
+  lineOuter: "#cfdbee",
+  lineSoft: "#e3ebf8",
+  earOuter: "#f8f2e8",
+  earInner: "#f8d4df",
+  eye: "#223356",
+  eyeLight: "#8fb0e2",
+  blush: "#f8aebe",
+  blushSoft: "#fbd7e0",
   tail: "#ddd5c8",
   leg: "#d7dfed",
-  shadowSoft: "#dbe5f4"
+  shadowSoft: "#dbe5f4",
+  candyMint: "#99e6da",
+  candyLemon: "#ffe08a",
+  charm: "#ffd665"
 } as const;
 
 function clampHexColor(input: string): string {
@@ -98,8 +101,8 @@ function framePreset(frame: PixelSheepFrame): {
 } {
   if (frame === "idle_b") return { face: "open", mouth: "neutral", turn: "front", bodyY: 1, headY: 0, squishX: 1, squishY: 1, blush: 0.88, eyeShift: 0, tuftY: 1, earY: 1, scarfSwing: 1 };
   if (frame === "blink_a" || frame === "blink_b") return { face: "blink", mouth: "neutral", turn: "front", bodyY: 0, headY: 0, squishX: 1, squishY: 1, blush: 0.88, eyeShift: 0, tuftY: 0, earY: 0, scarfSwing: 0 };
-  if (frame === "happy_a") return { face: "open", mouth: "smile", turn: "front", bodyY: -1, headY: -1, squishX: 1.01, squishY: 0.99, blush: 1, eyeShift: 0, tuftY: -1, earY: -1, scarfSwing: -1 };
-  if (frame === "happy_b") return { face: "open", mouth: "smile", turn: "front", bodyY: 0, headY: 0, squishX: 1, squishY: 1, blush: 1, eyeShift: 0, tuftY: 0, earY: 0, scarfSwing: 1 };
+  if (frame === "happy_a") return { face: "open", mouth: "smile", turn: "front", bodyY: -2, headY: -2, squishX: 1.02, squishY: 0.98, blush: 1, eyeShift: 0, tuftY: -2, earY: -1, scarfSwing: -1 };
+  if (frame === "happy_b") return { face: "open", mouth: "smile", turn: "front", bodyY: -1, headY: -1, squishX: 1.01, squishY: 0.99, blush: 1, eyeShift: 0, tuftY: -1, earY: -1, scarfSwing: 1 };
   if (frame === "expecting_a") return { face: "open", mouth: "tiny_o", turn: "front", bodyY: -1, headY: -1, squishX: 1, squishY: 1, blush: 0.9, eyeShift: 1, tuftY: -1, earY: -1, scarfSwing: -1 };
   if (frame === "expecting_b") return { face: "open", mouth: "tiny_o", turn: "front", bodyY: 0, headY: 0, squishX: 1, squishY: 1, blush: 0.9, eyeShift: -1, tuftY: 0, earY: 0, scarfSwing: 1 };
   if (frame === "curious_a") return { face: "open", mouth: "neutral", turn: "right", bodyY: 0, headY: -1, squishX: 1, squishY: 1, blush: 0.9, eyeShift: 1, tuftY: -1, earY: -1, scarfSwing: -1 };
@@ -108,8 +111,8 @@ function framePreset(frame: PixelSheepFrame): {
   if (frame === "sleepy_b") return { face: "blink", mouth: "comfort", turn: "front", bodyY: 1, headY: 1, squishX: 1.01, squishY: 0.99, blush: 0.76, eyeShift: 0, tuftY: 2, earY: 1, scarfSwing: 1 };
   if (frame === "press_a") return { face: "open", mouth: "neutral", turn: "front", bodyY: 2, headY: 2, squishX: 1.08, squishY: 0.92, blush: 0.86, eyeShift: 0, tuftY: 1, earY: 2, scarfSwing: 0 };
   if (frame === "press_b") return { face: "blink", mouth: "neutral", turn: "front", bodyY: 1, headY: 1, squishX: 1.05, squishY: 0.95, blush: 0.86, eyeShift: 0, tuftY: 1, earY: 1, scarfSwing: 1 };
-  if (frame === "jump_a") return { face: "open", mouth: "smile", turn: "front", bodyY: 2, headY: 1, squishX: 1.08, squishY: 0.92, blush: 1, eyeShift: 0, tuftY: 0, earY: 1, scarfSwing: 1 };
-  if (frame === "jump_b") return { face: "open", mouth: "smile", turn: "front", bodyY: -3, headY: -3, squishX: 0.94, squishY: 1.08, blush: 1, eyeShift: 0, tuftY: -2, earY: -2, scarfSwing: -1 };
+  if (frame === "jump_a") return { face: "open", mouth: "smile", turn: "front", bodyY: 2, headY: 1, squishX: 1.1, squishY: 0.9, blush: 1, eyeShift: 0, tuftY: 0, earY: 1, scarfSwing: 1 };
+  if (frame === "jump_b") return { face: "open", mouth: "smile", turn: "front", bodyY: -4, headY: -4, squishX: 0.92, squishY: 1.1, blush: 1, eyeShift: 0, tuftY: -2, earY: -2, scarfSwing: -1 };
   if (frame === "jump_c") return { face: "open", mouth: "smile", turn: "front", bodyY: 0, headY: 0, squishX: 1, squishY: 1, blush: 0.95, eyeShift: 0, tuftY: 0, earY: 0, scarfSwing: 0 };
   if (frame === "notice_a") return { face: "open", mouth: "neutral", turn: "front", bodyY: -1, headY: -2, squishX: 1, squishY: 1, blush: 0.96, eyeShift: 1, tuftY: -1, earY: -1, scarfSwing: -1 };
   if (frame === "notice_b") return { face: "open", mouth: "neutral", turn: "front", bodyY: 0, headY: -1, squishX: 1, squishY: 1, blush: 0.96, eyeShift: -1, tuftY: 0, earY: -1, scarfSwing: 1 };
@@ -229,6 +232,8 @@ export function PixelSheepSprite({ frame, scarfColor, size = 64, className = "" 
         <rect x="18" y="46" width="6" height="8" fill={PALETTE.leg} />
         <rect x="40" y="46" width="6" height="8" fill={PALETTE.leg} />
 
+        <rect x="15" y="38" width="1" height="6" fill={PALETTE.woolMid} />
+        <rect x="48" y="38" width="1" height="6" fill={PALETTE.woolMid} />
         <rect x="16" y="36" width="32" height="18" fill={PALETTE.woolMid} />
         <rect x="14" y="40" width="36" height="12" fill={PALETTE.woolMid} />
         <rect x="16" y="48" width="32" height="6" fill={PALETTE.woolShade} />
@@ -247,9 +252,13 @@ export function PixelSheepSprite({ frame, scarfColor, size = 64, className = "" 
         <rect x="46" y="35" width="1" height="3" fill={scarf} />
         <rect x="20" y="40" width="23" height="2" fill={scarf} />
         <rect x={scarfTailX} y="39" width="5" height="8" fill={scarf} />
+        <rect x="23" y="36" width="2" height="2" fill={PALETTE.candyMint} />
+        <rect x="29" y="36" width="2" height="2" fill={PALETTE.candyLemon} />
+        <rect x="35" y="36" width="2" height="2" fill={PALETTE.candyMint} />
         <rect x="20" y="41" width="23" height="1" fill="#ffffff55" />
         <rect x="19" y="35" width="27" height="1" fill="#ffffff66" />
         <rect x="19" y="40" width="26" height="1" fill="#00000014" />
+        <rect x={scarfTailX + 4} y="44" width="2" height="2" fill={PALETTE.charm} />
         </g>
       </g>
 
@@ -309,6 +318,12 @@ export function PixelSheepSprite({ frame, scarfColor, size = 64, className = "" 
                 <rect x={eyeBaseRight + eyeShift} y={eyeY + rightEyeYBias} width="1" height="1" fill={PALETTE.eyeLight} />
               </>
             ) : null}
+            {expression === "softHappy" ? (
+              <>
+                <rect x={eyeBaseLeft + eyeShift} y={eyeY - 1} width="1" height="1" fill={PALETTE.eyeLight} />
+                <rect x={eyeBaseRight + eyeShift} y={eyeY - 1 + rightEyeYBias} width="1" height="1" fill={PALETTE.eyeLight} />
+              </>
+            ) : null}
           </>
         )}
 
@@ -319,8 +334,8 @@ export function PixelSheepSprite({ frame, scarfColor, size = 64, className = "" 
 
         {preset.mouth === "smile" ? (
           <>
-            <rect x="30" y="41" width="4" height="1" fill={PALETTE.eye} />
-            <rect x="31" y="42" width="2" height="1" fill={PALETTE.eye} />
+            <rect x="29" y="41" width="6" height="1" fill={PALETTE.eye} />
+            <rect x="30" y="42" width="4" height="1" fill={PALETTE.eye} />
           </>
         ) : preset.mouth === "tiny_o" ? (
           <rect x="31" y="41" width="2" height="2" fill={PALETTE.eye} />
