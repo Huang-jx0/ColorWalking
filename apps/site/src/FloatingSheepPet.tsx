@@ -61,6 +61,21 @@ function randomRange(min: number, max: number): number {
   return Math.round(min + Math.random() * (max - min));
 }
 
+const IDLE_FRAME_LOOP: readonly PixelSheepFrame[] = [
+  "idle_a",
+  "idle_b",
+  "idle_a",
+  "idle_b",
+  "blink_a",
+  "idle_b",
+  "idle_a",
+  "idle_b",
+  "idle_a",
+  "idle_b",
+  "blink_b",
+  "idle_b"
+];
+
 export function FloatingSheepPet() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const moodTimerRef = useRef<number | null>(null);
@@ -244,8 +259,7 @@ export function FloatingSheepPet() {
     if (mood === "comfort") return tick % 2 === 0 ? "comfort_a" : "sleepy_a";
     if (mood === "notice") return tick % 2 === 0 ? "notice_a" : "notice_b";
     if (near) return tick % 2 === 0 ? "curious_a" : "turn_right";
-    const idle = ["idle_a", "idle_b", "blink_a", "idle_b", "blink_b"] as const;
-    return idle[tick % idle.length];
+    return IDLE_FRAME_LOOP[tick % IDLE_FRAME_LOOP.length] ?? "idle_a";
   }, [mood, tick, near, hop]);
 
   return (

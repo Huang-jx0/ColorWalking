@@ -54,6 +54,21 @@ const DRAW_EVENT = "colorwalking:draw-updated";
 const DRAW_PENDING_EVENT = "colorwalking:draw-pending";
 const LEVEL_XP = 100;
 const WALK_SECONDS = 30;
+const IDLE_FRAME_LOOP: readonly PixelSheepFrame[] = [
+  "idle_a",
+  "idle_b",
+  "idle_a",
+  "idle_b",
+  "blink_a",
+  "idle_b",
+  "idle_a",
+  "idle_b",
+  "idle_a",
+  "idle_b",
+  "blink_b",
+  "idle_b"
+];
+const FAREWELL_FRAME_LOOP: readonly PixelSheepFrame[] = ["back_a", "back_a", "back_look", "back_a"];
 const WALK_SOUVENIRS = ["叶子胸针", "彩虹石", "绒毛团子", "小铃铛", "星光缎带"];
 
 function clamp(value: number, min = 0, max = 100): number {
@@ -312,13 +327,13 @@ function frameByGardenState(action: PetAction, presence: PetPresenceState, emoti
   if (presence === "happy") return tick % 2 === 0 ? "happy_a" : "happy_b";
   if (presence === "sleepy") return tick % 2 === 0 ? "sleepy_a" : "sleepy_b";
   if (presence === "comfort") return "comfort_a";
-  if (presence === "farewell") return "back_look";
+  if (presence === "farewell") return FAREWELL_FRAME_LOOP[tick % FAREWELL_FRAME_LOOP.length] ?? "back_a";
 
   if (emotion === "sleepy") return tick % 2 === 0 ? "sleepy_a" : "sleepy_b";
   if (emotion === "upset") return "comfort_a";
   if (emotion === "needy") return tick % 2 === 0 ? "turn_left" : "turn_right";
   if (emotion === "bored") return tick % 2 === 0 ? "curious_a" : "turn_right";
-  return ["idle_a", "idle_b", "blink_a", "idle_b", "blink_b"][tick % 5] as PixelSheepFrame;
+  return IDLE_FRAME_LOOP[tick % IDLE_FRAME_LOOP.length] ?? "idle_a";
 }
 
 export function SheepPetGarden() {

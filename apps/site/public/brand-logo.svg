@@ -1,23 +1,50 @@
 ﻿<svg width="1024" height="512" viewBox="0 0 1024 512" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FF6B6B"/>
-      <stop offset="25%" stop-color="#FFD93D"/>
-      <stop offset="50%" stop-color="#6BCB77"/>
-      <stop offset="75%" stop-color="#4D96FF"/>
-      <stop offset="100%" stop-color="#845EC2"/>
+    <linearGradient id="halo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFE7B8"/>
+      <stop offset="100%" stop-color="#D7E8FF"/>
+    </linearGradient>
+    <linearGradient id="rainbow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F08392"/>
+      <stop offset="24%" stop-color="#FFD37E"/>
+      <stop offset="48%" stop-color="#7FCB8C"/>
+      <stop offset="72%" stop-color="#79AFFF"/>
+      <stop offset="100%" stop-color="#8E8BDB"/>
     </linearGradient>
   </defs>
+
   <rect width="1024" height="512" rx="32" fill="#F8FAFD"/>
+
   <g transform="translate(90,85)">
-    <circle cx="120" cy="120" r="96" fill="url(#brand)" opacity="0.2"/>
-    <ellipse cx="120" cy="138" rx="90" ry="72" fill="#FFFFFF" stroke="#1F2A44" stroke-width="6"/>
-    <path d="M56 120 C72 90, 94 90, 110 120 C126 150, 148 150, 164 120" fill="none" stroke="url(#brand)" stroke-width="10" stroke-linecap="round"/>
-    <circle cx="90" cy="130" r="8" fill="#1F2A44"/>
-    <circle cx="150" cy="130" r="8" fill="#1F2A44"/>
-    <path d="M96 162 Q120 182 144 162" fill="none" stroke="#1F2A44" stroke-width="6" stroke-linecap="round"/>
-    <text x="120" y="250" text-anchor="middle" font-size="24" font-family="Arial" fill="#1F2A44">五彩斑斓的小羊卷</text>
+    <circle cx="120" cy="120" r="96" fill="url(#halo)" opacity="0.58"/>
+    <circle cx="120" cy="120" r="79" fill="#FFFDF8" stroke="#2A3753" stroke-width="5"/>
+
+    <rect x="79" y="96" width="82" height="62" fill="#FBF9F4"/>
+    <rect x="79" y="126" width="82" height="32" fill="#EEE9DF"/>
+
+    <rect x="88" y="88" width="16" height="12" fill="#FFFDF8"/>
+    <rect x="104" y="84" width="16" height="16" fill="#FFFDF8"/>
+    <rect x="120" y="84" width="16" height="16" fill="#FFFDF8"/>
+    <rect x="136" y="88" width="16" height="12" fill="#FFFDF8"/>
+
+    <rect x="112" y="117" width="6" height="6" fill="#24324F"/>
+    <rect x="126" y="117" width="6" height="6" fill="#24324F"/>
+
+    <rect x="106" y="130" width="10" height="4" fill="#F5B7C3"/>
+    <rect x="128" y="130" width="10" height="4" fill="#F5B7C3"/>
+
+    <rect x="118" y="135" width="4" height="2" fill="#24324F"/>
+    <rect x="116" y="137" width="8" height="2" fill="#24324F"/>
+
+    <rect x="90" y="142" width="60" height="14" fill="#7EA9DF"/>
+    <rect x="124" y="150" width="10" height="12" fill="#7EA9DF"/>
+    <rect x="92" y="143" width="57" height="2" fill="#FFFFFF88"/>
+
+    <path d="M88 106 C101 90, 114 90, 127 106 C140 122, 153 122, 166 106" fill="none" stroke="url(#rainbow)" stroke-width="8" stroke-linecap="round"/>
+
+    <text x="120" y="250" text-anchor="middle" font-size="24" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1F2A44">五彩斑斓的小羊卷</text>
   </g>
-  <text x="400" y="210" font-size="78" font-weight="700" font-family="Arial" fill="#1F2A44">ColorWalking</text>
-  <text x="400" y="280" font-size="34" font-family="Arial" fill="#54627D">Walk in color, walk in mood.</text>
+
+  <text x="400" y="210" font-size="78" font-weight="700" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1F2A44">ColorWalking</text>
+  <text x="400" y="280" font-size="34" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#54627D">Walk in color, walk in mood.</text>
 </svg>
