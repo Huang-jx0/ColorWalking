@@ -9,15 +9,23 @@ $safeRepo = $repoRoot -replace "\\", "/"
 
 Set-Location $repoRoot
 
-$dirty = git -c "safe.directory=$safeRepo" status --porcelain
+function Invoke-Git {
+  param([Parameter(Mandatory = $true)][string[]]$Args)
+  & git @Args
+  if ($LASTEXITCODE -ne 0) {
+    throw "git command failed: git $($Args -join ' ')"
+  }
+}
+
+$dirty = & git -c "safe.directory=$safeRepo" status --porcelain
 if (-not $dirty) {
   Write-Host "No local changes to commit."
   exit 0
 }
 
-git -c "safe.directory=$safeRepo" add -A
-git -c "safe.directory=$safeRepo" commit -m $Message
-git -c "safe.directory=$safeRepo" push origin main
+Invoke-Git -Args @("-c", "safe.directory=$safeRepo", "add", "-A")
+Invoke-Git -Args @("-c", "safe.directory=$safeRepo", "commit", "-m", $Message)
+Invoke-Git -Args @("-c", "safe.directory=$safeRepo", "push", "origin", "main")
 
-$head = git -c "safe.directory=$safeRepo" rev-parse --short HEAD
+$head = & git -c "safe.directory=$safeRepo" rev-parse --short HEAD
 Write-Host "Committed and pushed: $head"
