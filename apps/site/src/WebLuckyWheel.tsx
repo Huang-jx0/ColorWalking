@@ -255,7 +255,7 @@ export function WebLuckyWheel() {
           className={mode === "random" ? "mode-btn active" : "mode-btn"}
           onClick={() => {
             setMode("random");
-            if (ritualState === "idle") setRitualLine(MODE_RITUAL_LINE.random(false));
+            if (ritualState === "idle") setRitualLine(MODE_RITUAL_LINE.random());
           }}
         >
           随机模式

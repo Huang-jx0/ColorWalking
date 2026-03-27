@@ -1,4 +1,4 @@
-export type LuckyMode = "daily" | "random";
+﻿export type LuckyMode = "daily" | "random";
 
 export const RITUAL_LINES = [
   "先深呼吸一下，我们来揭晓今天的颜色。",
@@ -6,7 +6,7 @@ export const RITUAL_LINES = [
   "转盘不是答案，它只是给今天一点光。"
 ] as const;
 
-export const MODE_RITUAL_LINE: Record<LuckyMode, (hasCached: boolean) => string> = {
+export const MODE_RITUAL_LINE: Record<LuckyMode, (hasCached?: boolean) => string> = {
   daily: (hasCached) =>
     hasCached ? "今天已经抽过啦，点一下可以再看一次结果。" : "准备好就点一下，开始今天的小仪式。",
   random: () => "随机模式下，每一次转动都是新的相遇。"

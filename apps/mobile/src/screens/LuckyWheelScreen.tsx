@@ -10,6 +10,7 @@ import {
   Text,
   View
 } from "react-native";
+import { buildLuckyShareText, MODE_RITUAL_LINE, RITUAL_LINES } from "@colorwalking/shared";
 import { MobileSheepCompanion } from "../components/MobileSheepCompanion";
 import {
   COLOR_PALETTE,
@@ -32,22 +33,6 @@ type RitualStore = {
   dayKey: string;
   result: DrawResult;
 };
-
-const RITUAL_LINES = [
-  "先深呼吸一下，我们来揭晓今天的颜色。",
-  "每天给自己十秒钟，也是一种温柔。",
-  "转盘不是答案，它只是给今天一点光。"
-] as const;
-
-const MODE_RITUAL_LINE = {
-  daily: (hasCached: boolean) =>
-    hasCached ? "今天已经抽过啦，点一下可以再看一次结果。" : "准备好就点一下，开始今天的小仪式。",
-  random: () => "随机模式下，每一次转动都是新的相遇。"
-} as const;
-
-function buildLuckyShareText(name: string, hex: string, message: string): string {
-  return `我在 ColorWalking 抽到今日幸运色：${name} ${hex}。${message}`;
-}
 
 async function loadRitual(): Promise<RitualStore | null> {
   const raw = await AsyncStorage.getItem(RITUAL_KEY);
