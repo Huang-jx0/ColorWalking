@@ -39,6 +39,22 @@ npm run sync:push
 powershell -ExecutionPolicy Bypass -File .\scripts\sync-push.ps1 -Message "feat: your message"
 ```
 
+## 浏览器下载 APK（Android）
+1. 登录 Expo（首次需要）：
+```powershell
+npm run eas:login
+```
+2. 触发云端构建 APK（会输出可下载链接）：
+```powershell
+npm run build:apk
+```
+3. 将 APK 发布到站点下载目录：
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\publish-apk-to-site.ps1 -ApkPath "D:\path\to\your.apk"
+```
+4. 部署站点后浏览器下载：
+- `/downloads/colorwalking-latest.apk`
+
 ## 原创保护
 本项目视觉、文案、品牌设定（含“五彩斑斓的小羊卷”）默认归 ColorWalking 项目版权所有。
 详见 `COPYRIGHT.md`。

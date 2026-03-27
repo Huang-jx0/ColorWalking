@@ -10,6 +10,7 @@
     "dev:mobile": "npm --workspace @colorwalking/mobile run start",
     "dev:site": "npm --workspace @colorwalking/site run dev",
     "build:site": "npm --workspace @colorwalking/site run build",
+    "eas:login": "powershell -ExecutionPolicy Bypass -File ./scripts/eas-login.ps1",
     "build:apk": "powershell -ExecutionPolicy Bypass -File ./scripts/build-android-apk.ps1",
     "publish:apk": "powershell -ExecutionPolicy Bypass -File ./scripts/publish-apk-to-site.ps1",
     "sync:sheep": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-sheep-appearance.ps1",
