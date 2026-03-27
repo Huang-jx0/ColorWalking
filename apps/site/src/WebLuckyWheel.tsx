@@ -1,17 +1,21 @@
-import {
+﻿import {
   COLOR_PALETTE,
   computeHistoryStats,
   createDrawEngine,
   formatDayKey,
   type DrawResult
 } from "@colorwalking/shared";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const HISTORY_KEY = "colorwalking.web.history.v1";
 const RITUAL_KEY = "colorwalking.web.ritual.v1";
 const DRAW_PENDING_EVENT = "colorwalking:draw-pending";
 const DRAW_UPDATED_EVENT = "colorwalking:draw-updated";
-const BASE_ROUNDS = 10;
+
+const WEB_BASE_ROUNDS = 9;
+const WEB_EXTRA_ROUNDS = 4;
+const WEB_BASE_DURATION = 3600;
+const WEB_EXTRA_DURATION = 1100;
 
 type DrawMode = "random" | "daily";
 type RitualState = "idle" | "spinning" | "revealing";
@@ -22,19 +26,19 @@ type RitualStore = {
 };
 
 const RITUAL_LINES = [
-  "把今天交给一抹颜色，也交给自己一口慢呼吸。",
-  "不用急着变好，先给心情一个轻轻落点。",
-  "转盘不是答案，是一份柔软的小提醒。"
+  "先深呼吸一下，我们来揭晓今天的颜色。",
+  "每天给自己十秒钟，也是一种温柔。",
+  "转盘不是答案，它只是给今天一点光。"
 ] as const;
 
 const COLOR_CARE: Record<string, string> = {
-  "sunrise-coral": "今天适合先照顾心情，再处理效率。",
-  "golden-spark": "先把注意力放在一件小事上，就已经很了不起。",
-  "mint-breath": "慢慢呼吸，你不用一直绷着。",
-  "river-blue": "遇到着急的事，先稳住节奏再做决定。",
-  "grape-night": "把担心写下来，心里会慢慢空一点。",
-  "peach-mist": "对自己说话时，可以再温柔一点点。",
-  "sky-foam": "先做一点轻盈尝试，不必一开始就完美。",
+  "sunrise-coral": "今天适合先照顾心情，再照顾效率。",
+  "golden-spark": "先完成一件小事，你已经在前进。",
+  "mint-breath": "慢一点，也是在好好生活。",
+  "river-blue": "遇到急事时，先稳住呼吸再决定。",
+  "grape-night": "把担心写下来，心里会轻一点。",
+  "peach-mist": "对自己说话时，可以更温柔一点。",
+  "sky-foam": "先轻轻尝试，不必一开始就完美。",
   "rose-dawn": "今天也值得被喜欢，哪怕只是一瞬间。"
 };
 
@@ -49,17 +53,15 @@ function buildWheelGradient(): string {
   return `conic-gradient(from 0deg, ${parts.join(", ")})`;
 }
 
-// PERF-15: COLOR_PALETTE 是模块级常量，渐变字符串只需计算一次
 const WHEEL_GRADIENT = buildWheelGradient();
 
-// FEAT-04: 根据模式和缓存状态生成仪式感文案
 function ritualLineByMode(mode: DrawMode, hasCached: boolean): string {
   if (mode === "daily") {
     return hasCached
-      ? "今天的颜色已为你准备好，点一下就能再看一次揭晓。"
-      : "准备好就点一下，我们开始今天的小仪式。";
+      ? "今天已经抽过啦，点一下可以再看一次结果。"
+      : "准备好就点一下，开始今天的小仪式。";
   }
-  return "随机模式下，每次转动都是一次全新的相遇。";
+  return "随机模式下，每一次转动都是新的相遇。";
 }
 
 function loadRitual(): RitualStore | null {
@@ -95,13 +97,13 @@ function saveHistory(list: DrawResult[]) {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
   } catch {
-    // ignore storage errors
+    // ignore
   }
 }
 
 function reminderByColor(result: DrawResult | null): string {
-  if (!result) return "今天不用急着变好，先给自己一点好心情。";
-  return COLOR_CARE[result.color.id] ?? "今天也请温柔地和自己站在同一边。";
+  if (!result) return "今天不用急着变好，先让自己轻松一点。";
+  return COLOR_CARE[result.color.id] ?? "今天也请和自己站在同一边。";
 }
 
 function loadTodayRitualResult(): DrawResult | null {
@@ -118,7 +120,7 @@ async function copyTextFallback(text: string): Promise<boolean> {
       return true;
     }
   } catch {
-    // fallback to execCommand
+    // fallback
   }
 
   try {
@@ -149,13 +151,12 @@ export function WebLuckyWheel() {
   const [shareHint, setShareHint] = useState("");
   const [ritualState, setRitualState] = useState<RitualState>("idle");
   const [ritualLine, setRitualLine] = useState(
-    result ? "今天的颜色已为你准备好，点一下就能再看一次揭晓。" : "准备好就点一下，我们开始今天的小仪式。"
+    result ? "今天的颜色已经准备好了，点一下再看一次揭晓。" : "准备好就点一下，我们开始今天的小仪式。"
   );
   const [todayCached, setTodayCached] = useState(() => Boolean(loadTodayRitualResult()));
-  // FEAT-03: 历史记录展开状态
   const [historyExpanded, setHistoryExpanded] = useState(false);
-  // FEAT-05: 揭晓瞬间动画状态
   const [isNewResult, setIsNewResult] = useState(false);
+  const rotationRef = useRef(0);
 
   const spinning = ritualState === "spinning";
   const history = historyExpanded ? historyAll : historyAll.slice(0, 5);
@@ -181,23 +182,25 @@ export function WebLuckyWheel() {
 
       const sector = 360 / engine.palette.length;
       const targetCenter = draw.index * sector + sector / 2;
-      const rounds = BASE_ROUNDS + Math.floor(Math.random() * 5);
-      const duration = 4000 + Math.floor(Math.random() * 1200);
+      const rounds = WEB_BASE_ROUNDS + Math.floor(Math.random() * WEB_EXTRA_ROUNDS);
+      const duration = WEB_BASE_DURATION + Math.floor(Math.random() * WEB_EXTRA_DURATION);
+      const nextAngle = rotationRef.current - rounds * 360 - targetCenter;
 
       setRitualState("spinning");
       setSpinMs(duration);
-      window.dispatchEvent(new CustomEvent(DRAW_PENDING_EVENT));
-      setRitualLine("小羊卷在旁边等你，我们一起揭晓今天的颜色。");
+      setRitualLine("小羊卷在等你，马上揭晓今天的颜色。");
       setShareHint("");
+      window.dispatchEvent(new CustomEvent(DRAW_PENDING_EVENT));
+
       window.requestAnimationFrame(() => {
-        setAngle((prev) => prev - rounds * 360 - targetCenter);
+        setAngle(nextAngle);
       });
 
       window.setTimeout(() => {
+        rotationRef.current = nextAngle;
         setRitualState("revealing");
-        setRitualLine("结果出来啦，收下这份只属于今天的温柔。");
+        setRitualLine("结果出来了，收下这份属于今天的温柔。");
         setResult(draw);
-        // FEAT-05: 触发揭晓瞬间动画
         setIsNewResult(true);
         window.setTimeout(() => setIsNewResult(false), 900);
 
@@ -215,19 +218,19 @@ export function WebLuckyWheel() {
 
         window.setTimeout(() => {
           setRitualState("idle");
-          const randomLine = RITUAL_LINES[Math.floor(Math.random() * RITUAL_LINES.length)] ?? RITUAL_LINES[0];
-          setRitualLine(randomLine);
+          const line = RITUAL_LINES[Math.floor(Math.random() * RITUAL_LINES.length)] ?? RITUAL_LINES[0];
+          setRitualLine(line);
         }, 520);
       }, duration);
     } catch {
       setRitualState("idle");
-      setRitualLine("这次没有顺利转起来，再点一下试试，我会陪着你。");
+      setRitualLine("这次没转起来，我们再轻轻试一次。");
     }
   };
 
   const onShare = async () => {
     if (!result) return;
-    const text = `我在 ColorWalking 抽到今日幸运色：${result.color.name} ${result.color.hex}。${result.color.message}`;
+    const text = `我在 ColorWalking 抽到了今日幸运色：${result.color.name} ${result.color.hex}。${result.color.message}`;
     const url = window.location.href;
     const merged = `${text}\n${url}`;
     try {
@@ -236,36 +239,26 @@ export function WebLuckyWheel() {
         setShareHint("已打开分享面板");
       } else {
         const ok = await copyTextFallback(merged);
-        if (ok) {
-          setShareHint("已复制分享文案");
-        } else {
-          window.prompt("复制这段内容去分享：", merged);
-          setShareHint("已为你准备好分享内容");
-        }
+        setShareHint(ok ? "已复制分享文案" : "复制失败，请手动复制");
       }
     } catch (err) {
-      const maybeAbort = err instanceof Error && err.name === "AbortError";
-      if (maybeAbort) {
-        setShareHint("你取消了分享，没关系。");
+      if (err instanceof Error && err.name === "AbortError") {
+        setShareHint("你取消了分享，没关系");
       } else {
         const ok = await copyTextFallback(merged);
-        setShareHint(ok ? "分享面板不可用，已帮你复制。" : "这次先不分享也没关系。");
+        setShareHint(ok ? "已复制分享文案" : "这次先不分享也没关系");
       }
     }
     window.setTimeout(() => setShareHint(""), 2200);
   };
 
   const centerLabel =
-    ritualState === "spinning"
-      ? "揭晓中"
-      : mode === "daily" && todayCached
-        ? "再看今日色"
-        : "开始抽色";
+    ritualState === "spinning" ? "揭晓中" : mode === "daily" && todayCached ? "再看今日色" : "开始抽色";
 
   return (
     <section className="play-card">
-      <h2>网页转盘</h2>
-      <p>点一下圆盘，抽取今天的幸运色和一句温柔提醒。</p>
+      <h2>网页幸运转盘</h2>
+      <p>点一下圆盘，抽取今天的幸运色和一条温柔提醒。</p>
       <p className="draw-ritual">{ritualLine}</p>
 
       <div className="mode-switch">
@@ -360,21 +353,16 @@ export function WebLuckyWheel() {
                 ))}
               </ul>
               {historyAll.length > 5 && (
-                <button
-                  type="button"
-                  className="ghost-btn history-toggle-btn"
-                  onClick={() => setHistoryExpanded(v => !v)}
-                >
+                <button type="button" className="ghost-btn history-toggle-btn" onClick={() => setHistoryExpanded((v) => !v)}>
                   {historyExpanded ? "收起" : `查看全部 ${historyAll.length} 条记录`}
                 </button>
               )}
             </>
           ) : (
-            <p>这里还空着，等你来点亮第一条记录。</p>
+            <p>这里还空着，等你点亮第一条记录。</p>
           )}
         </div>
       </div>
     </section>
   );
 }
-

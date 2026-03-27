@@ -155,6 +155,18 @@ h1 {
   box-shadow: 0 14px 28px rgba(40, 86, 185, 0.32);
 }
 
+.cta-button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.cta-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: 0 8px 20px rgba(40, 86, 185, 0.18);
+}
+
 .ghost-btn {
   display: inline-block;
   padding: 10px 14px;

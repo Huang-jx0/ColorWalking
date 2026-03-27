@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+﻿import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { formatDayKey } from "@colorwalking/shared";
 import { PixelSheepSprite, type PixelSheepFrame } from "./PixelSheepSprite";
 
@@ -14,7 +14,7 @@ const DISCOVER_KEY = "colorwalking.floating-pet.discover.v2";
 
 const IDLE_LINES = [
   "小羊卷在这儿，想陪你看看今天的颜色。",
-  "如果有点累，我们先慢一点点。",
+  "如果有点累，我们先慢一点。",
   "我会在旁边，不会打扰你。",
   "今天也值得被温柔对待。"
 ] as const;
@@ -112,7 +112,6 @@ export function FloatingSheepPet() {
     }
     moodTimerRef.current = window.setTimeout(() => {
       setMood("idle");
-      // 进场后 3–5s 给一句轻声问候，让小羊卷立刻有存在感
       window.setTimeout(() => {
         const pool = hasTodayDraw() ? COMFORT_LINES : IDLE_LINES;
         const line = pool[Math.floor(Math.random() * pool.length)] ?? pool[0];
@@ -127,13 +126,13 @@ export function FloatingSheepPet() {
   useEffect(() => {
     const onPending = () => {
       setMood("expecting");
-      setBubble("我在看着转盘，等你揭晓。");
+      setBubble("我在看着转盘，等你揭晓。\n");
     };
     const onDraw = (e: Event) => {
       const detail = (e as CustomEvent<WheelDetail>).detail;
       const name = detail?.color?.name ?? "幸运色";
       setMood("happy");
-      setBubble(`抽到了「${name}」，这份颜色真适合今天。`);
+      setBubble(`抽到了「${name}」，这份颜色很适合今天。`);
       setHasTodayColor(true);
       setScarfColor(readTodayScarfColor());
       setHop(true);
@@ -160,10 +159,10 @@ export function FloatingSheepPet() {
           if (!entry.isIntersecting) return;
           if (entry.target.id === "play") {
             setFocusSection("play");
-            setBubble(hasTodayColor ? "今天的颜色在这里，点一下可以再看一次揭晓。" : "要不要现在抽一下今日幸运色？");
+            setBubble(hasTodayColor ? "今天的颜色在这里，点一下可以再看一次揭晓。" : "要不要现在抽一下今天的幸运色？");
           } else if (entry.target.id === "pet") {
             setFocusSection("pet");
-            setBubble("我在这里，陪你慢慢照顾小羊卷。");
+            setBubble("我在这里，陪你慢慢照顾小羊卷。\n");
           }
         });
       },
@@ -190,7 +189,7 @@ export function FloatingSheepPet() {
           setNear(nextNear);
           if (nextNear) {
             setMood("notice");
-            setBubble("我看到你啦，今天也辛苦了。");
+            setBubble("我看到你啦，今天也辛苦了。\n");
             window.setTimeout(() => setMood((prev) => (prev === "notice" ? "idle" : prev)), 1300);
           }
         }
@@ -204,14 +203,11 @@ export function FloatingSheepPet() {
   }, [near]);
 
   useEffect(() => {
-    const tick = () => {
-      if (!near) {
-        setOffset({ x: randomRange(-24, 18), y: randomRange(-14, 10) });
-      }
-      const nextDelay = randomRange(4200, 6800);
-      driftTimerRef.current = window.setTimeout(tick, nextDelay);
+    const drift = () => {
+      if (!near) setOffset({ x: randomRange(-24, 18), y: randomRange(-14, 10) });
+      driftTimerRef.current = window.setTimeout(drift, randomRange(4200, 6800));
     };
-    tick();
+    drift();
     return () => {
       if (driftTimerRef.current) window.clearTimeout(driftTimerRef.current);
     };
@@ -223,9 +219,9 @@ export function FloatingSheepPet() {
       setHasTodayColor(nextHasToday);
       setScarfColor(readTodayScarfColor());
       if (!nextHasToday) {
-        setBubble("今天的颜色还没抽，我可以陪你去看看转盘。");
+        setBubble("今天的颜色还没抽，我可以陪你去转盘看看。\n");
       } else if (focusSection === "pet") {
-        setBubble("抱抱、摸摸、散步都可以，我在这儿陪你。");
+        setBubble("抱抱、摸摸、散步都可以，我在这儿陪你。\n");
       } else {
         const pool = Math.random() > 0.45 ? COMFORT_LINES : IDLE_LINES;
         const line = pool[Math.floor(Math.random() * pool.length)] ?? pool[0];
@@ -233,11 +229,9 @@ export function FloatingSheepPet() {
       }
       setMood("comfort");
       window.setTimeout(() => setMood("idle"), 2000);
-      const nextDelay = randomRange(22000, 36000);
-      talkTimerRef.current = window.setTimeout(speakSlowly, nextDelay);
+      talkTimerRef.current = window.setTimeout(speakSlowly, randomRange(22000, 36000));
     };
 
-    // 首次说话缩短至 8–14s，让陪伴感更即时
     talkTimerRef.current = window.setTimeout(speakSlowly, randomRange(8000, 14000));
     return () => {
       if (talkTimerRef.current) window.clearTimeout(talkTimerRef.current);
@@ -253,7 +247,7 @@ export function FloatingSheepPet() {
     setMood("notice");
     setHop(true);
     window.setTimeout(() => setHop(false), 900);
-    setBubble(target === "play" ? "走吧，我们去抽今天的幸运色。" : "走吧，去看看小羊卷现在的状态。");
+    setBubble(target === "play" ? "走吧，我们去抽今天的幸运色。" : "走吧，去看看小羊卷现在的状态。\n");
     scrollToId(target);
   };
 

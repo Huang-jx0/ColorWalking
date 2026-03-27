@@ -30,7 +30,7 @@ export function LuckyWheelScreen() {
   const engine = useMemo(() => createDrawEngine(COLOR_PALETTE), []);
   const rotate = useRef(new Animated.Value(0)).current;
   const totalAngle = useRef(0);
-  const [mode, setMode] = useState<DrawMode>("random");
+  const [mode, setMode] = useState<DrawMode>("daily");
   const [result, setResult] = useState<DrawResult | null>(null);
   const [historyAll, setHistoryAll] = useState<DrawResult[]>([]);
   const [spinning, setSpinning] = useState(false);
