@@ -17,7 +17,7 @@ const BUILD_TAG = import.meta.env.VITE_BUILD_TIME ?? new Date().toISOString().sl
 const NAV_ITEMS = [
   { href: "features", label: "产品亮点" },
   { href: "play", label: "幸运转盘" },
-  { href: "oracle", label: "黄历生辰" },
+  { href: "oracle", label: "时色签" },
   { href: "pet", label: "小羊卷" },
   { href: "mobile-download", label: "下载 App" }
 ] as const;
@@ -190,3 +190,4 @@ export function App() {
     </div>
   );
 }
+
