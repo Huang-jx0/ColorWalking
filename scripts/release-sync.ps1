@@ -23,6 +23,26 @@ function Invoke-Step {
   }
 }
 
+function Ensure-ExpoToken {
+  if ($env:EXPO_TOKEN) {
+    return
+  }
+
+  $userToken = [Environment]::GetEnvironmentVariable('EXPO_TOKEN', 'User')
+  if ($userToken) {
+    $env:EXPO_TOKEN = $userToken
+    return
+  }
+
+  $machineToken = [Environment]::GetEnvironmentVariable('EXPO_TOKEN', 'Machine')
+  if ($machineToken) {
+    $env:EXPO_TOKEN = $machineToken
+    return
+  }
+
+  throw 'EXPO_TOKEN not found. Set it once with: [Environment]::SetEnvironmentVariable("EXPO_TOKEN","<your-token>","User")'
+}
+
 function Ensure-GitSafeDirectory {
   Set-Location $root
   $rootPath = (Resolve-Path $root).Path
@@ -76,6 +96,7 @@ function Wait-BuildFinished {
   throw "Timeout waiting for build to finish: $BuildId"
 }
 
+Ensure-ExpoToken
 Ensure-GitSafeDirectory
 Ensure-CleanWorktree
 
