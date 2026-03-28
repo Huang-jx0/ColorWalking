@@ -10,6 +10,9 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@colorwalking/chibi-ui':
+        specifier: workspace:*
+        version: link:../../packages/chibi-ui
       '@colorwalking/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -72,6 +75,15 @@ importers:
       vite-plugin-pwa:
         specifier: ^0.20.5
         version: 0.20.5(vite@6.4.1(@types/node@25.5.0)(lightningcss@1.27.0)(terser@5.46.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
+
+  packages/chibi-ui:
+    dependencies:
+      react:
+        specifier: '>=19.0.0'
+        version: 19.0.0
+      react-native:
+        specifier: '>=0.79.0'
+        version: 0.79.6(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)
 
   packages/shared: {}
 
