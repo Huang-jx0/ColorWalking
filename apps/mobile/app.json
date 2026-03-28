@@ -25,7 +25,7 @@
         "backgroundColor": "#F4F6FB"
       },
       "package": "com.colorwalking.app",
-      "versionCode": 2
+      "versionCode": 3
     },
     "extra": {
       "eas": {

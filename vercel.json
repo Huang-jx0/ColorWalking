@@ -5,25 +5,24 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/download/app.apk",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "Content-Type", "value": "application/vnd.android.package-archive" }
+      ]
+    },
+    {
+      "source": "/downloads/colorwalking-latest.apk",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" },
+        { "key": "Content-Type", "value": "application/vnd.android.package-archive" }
+      ]
+    }
+  ],
   "routes": [
-    {
-      "src": "^/download/app\\.apk$",
-      "status": 302,
-      "headers": {
-        "Location": "https://expo.dev/artifacts/eas/aHsx6DiGxsghtUM1nAyqaU.apk",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
-      }
-    },
-    {
-      "src": "^/downloads/colorwalking-latest\\.apk$",
-      "status": 302,
-      "headers": {
-        "Location": "https://expo.dev/artifacts/eas/aHsx6DiGxsghtUM1nAyqaU.apk",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
-      }
-    },
     { "handle": "filesystem" },
     { "src": "^/(.*)$", "dest": "/index.html" }
   ]
 }
-
