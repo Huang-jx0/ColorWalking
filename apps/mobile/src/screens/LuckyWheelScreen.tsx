@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   Animated,
   Easing,
+  Image,
   Pressable,
   ScrollView,
   Share,
@@ -31,6 +32,8 @@ const APP_EXTRA_DURATION = 1100;
 const REVEAL_SETTLE_MS = 520;
 const COMPANION_COOLDOWN_MS = 1800;
 const ORBIT_SPIN_MS = 660;
+
+const ICON = require("../../assets/icon.png");
 
 type DrawMode = "random" | "daily";
 type RitualState = "idle" | "spinning" | "revealing";
@@ -79,8 +82,7 @@ export function LuckyWheelScreen() {
     AsyncStorage.getItem(HISTORY_KEY).then((raw) => {
       if (!raw) return;
       try {
-        const parsed = JSON.parse(raw) as DrawResult[];
-        setHistoryAll(parsed);
+        setHistoryAll(JSON.parse(raw) as DrawResult[]);
       } catch {
         setHistoryAll([]);
       }
@@ -91,15 +93,13 @@ export function LuckyWheelScreen() {
       if (ritual.dayKey === formatDayKey(new Date())) {
         setResult(ritual.result);
         setTodayCached(true);
-        setRitualLine("今天的颜色已经准备好了，你可以再看一次揭晓。");
+        setRitualLine("今天的颜色已经准备好了，你可以再看一次揭晓。\n");
       }
     });
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCompanionPhase("idle");
-    }, 1200);
+    const timer = setTimeout(() => setCompanionPhase("idle"), 1200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -117,14 +117,9 @@ export function LuckyWheelScreen() {
       orbitLoopRef.current.start();
     } else {
       orbitLoopRef.current?.stop();
-      orbitSpin.stopAnimation(() => {
-        orbitSpin.setValue(0);
-      });
+      orbitSpin.stopAnimation(() => orbitSpin.setValue(0));
     }
-
-    return () => {
-      orbitLoopRef.current?.stop();
-    };
+    return () => orbitLoopRef.current?.stop();
   }, [orbitSpin, spinning]);
 
   useEffect(() => {
@@ -163,7 +158,7 @@ export function LuckyWheelScreen() {
 
     setCompanionPhase("anticipate");
     setRitualState("spinning");
-    setRitualLine("小羊卷在等你，一起揭晓今天的颜色。");
+    setRitualLine("小羊卷抱着幸运色礼盒，正在转转转。\n");
 
     const sector = 360 / engine.palette.length;
     const targetCenter = draw.index * sector + sector / 2;
@@ -182,8 +177,9 @@ export function LuckyWheelScreen() {
 
       setRitualState("revealing");
       setCompanionPhase("revealing");
-      setRitualLine("结果出来了，收下这份属于今天的温柔。");
+      setRitualLine("叮！小羊卷把今天的颜色递给你啦。\n");
       setResult(draw);
+
       revealAnim.setValue(0);
       Animated.timing(revealAnim, {
         toValue: 1,
@@ -194,11 +190,8 @@ export function LuckyWheelScreen() {
 
       const existingTodayIndex = historyAll.findIndex((x) => x.dayKey === draw.dayKey);
       let nextHistory = [...historyAll];
-      if (existingTodayIndex >= 0 && mode === "daily") {
-        nextHistory[existingTodayIndex] = draw;
-      } else {
-        nextHistory = [draw, ...nextHistory];
-      }
+      if (existingTodayIndex >= 0 && mode === "daily") nextHistory[existingTodayIndex] = draw;
+      else nextHistory = [draw, ...nextHistory];
 
       void persistHistory(nextHistory);
       revealSettleTimerRef.current = setTimeout(() => {
@@ -225,10 +218,7 @@ export function LuckyWheelScreen() {
   const spinStyle = {
     transform: [
       {
-        rotate: rotate.interpolate({
-          inputRange: [0, 360],
-          outputRange: ["0deg", "360deg"]
-        })
+        rotate: rotate.interpolate({ inputRange: [0, 360], outputRange: ["0deg", "360deg"] })
       }
     ]
   };
@@ -236,10 +226,7 @@ export function LuckyWheelScreen() {
   const orbitSpinStyle = {
     transform: [
       {
-        rotate: orbitSpin.interpolate({
-          inputRange: [0, 1],
-          outputRange: ["0deg", "360deg"]
-        })
+        rotate: orbitSpin.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] })
       }
     ]
   };
@@ -247,43 +234,39 @@ export function LuckyWheelScreen() {
   const centerLabel = spinning
     ? "揭晓中"
     : ritualState === "revealing"
-      ? "结果揭晓"
+      ? "出结果啦"
       : mode === "daily" && todayCached
         ? "再看今日色"
         : "开始抽色";
 
   const revealStyle = {
-    opacity: revealAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.7, 1]
-    }),
+    opacity: revealAnim.interpolate({ inputRange: [0, 1], outputRange: [0.72, 1] }),
     transform: [
       {
-        scale: revealAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.96, 1]
-        })
+        scale: revealAnim.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] })
       }
     ]
   };
 
   const revealPulseStyle = {
-    opacity: revealAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.36, 0]
-    }),
+    opacity: revealAnim.interpolate({ inputRange: [0, 1], outputRange: [0.36, 0] }),
     transform: [
       {
-        scale: revealAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.88, 1.35]
-        })
+        scale: revealAnim.interpolate({ inputRange: [0, 1], outputRange: [0.88, 1.35] })
       }
     ]
   };
 
   return (
     <ScrollView contentContainerStyle={styles.page}>
+      <View style={styles.heroCard}>
+        <Image source={ICON} style={styles.heroIcon} resizeMode="contain" />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title}>ColorWalking</Text>
+          <Text style={styles.subtitle}>Q版小羊卷陪你抽今天的幸运色</Text>
+        </View>
+      </View>
+
       <MobileSheepCompanion phase={companionPhase} colorName={result?.color.name} />
 
       <Text style={styles.ritualLine}>{ritualLine}</Text>
@@ -293,9 +276,7 @@ export function LuckyWheelScreen() {
           disabled={busy}
           onPress={() => {
             setMode("daily");
-            if (ritualState === "idle") {
-              setRitualLine(MODE_RITUAL_LINE.daily(todayCached));
-            }
+            if (ritualState === "idle") setRitualLine(MODE_RITUAL_LINE.daily(todayCached));
           }}
           style={[styles.modeBtn, mode === "daily" && styles.modeBtnActive]}
         >
@@ -313,22 +294,24 @@ export function LuckyWheelScreen() {
         </Pressable>
       </View>
 
-      <View style={styles.wheelBlock}>
-        <View style={styles.pointer} />
-        <Pressable style={styles.wheelPressable} onPress={() => void spin()} disabled={busy}>
-          <View pointerEvents="none" style={[styles.orbitWrap, spinning && styles.orbitWrapActive]}>
-            <View style={styles.orbitTrack} />
-            <Animated.View style={[styles.orbitDotCarrier, orbitSpinStyle]}>
-              <View style={styles.orbitDot} />
+      <View style={styles.wheelCard}>
+        <View style={styles.wheelBlock}>
+          <View style={styles.pointer} />
+          <Pressable style={styles.wheelPressable} onPress={() => void spin()} disabled={busy}>
+            <View pointerEvents="none" style={[styles.orbitWrap, spinning && styles.orbitWrapActive]}>
+              <View style={styles.orbitTrack} />
+              <Animated.View style={[styles.orbitDotCarrier, orbitSpinStyle]}>
+                <View style={styles.orbitDot} />
+              </Animated.View>
+            </View>
+            <Animated.View style={[styles.wheelSurface, spinStyle]}>
+              <WheelGraphic size={WHEEL_SIZE} colors={engine.palette} />
             </Animated.View>
-          </View>
-          <Animated.View style={[styles.wheelSurface, spinStyle]}>
-            <WheelGraphic size={WHEEL_SIZE} colors={engine.palette} />
-          </Animated.View>
-          <Pressable style={[styles.centerBtn, busy && styles.centerBtnDisabled]} onPress={() => void spin()} disabled={busy}>
-            <Text style={styles.centerText}>{centerLabel}</Text>
+            <Pressable style={[styles.centerBtn, busy && styles.centerBtnDisabled]} onPress={() => void spin()} disabled={busy}>
+              <Text style={styles.centerText}>{centerLabel}</Text>
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </View>
       </View>
 
       <View style={styles.card}>
@@ -343,9 +326,9 @@ export function LuckyWheelScreen() {
             <Text style={styles.hex}>{result.color.hex}</Text>
             {result.color.moodTag ? <Text style={styles.moodTag}>情绪关键词：{result.color.moodTag}</Text> : null}
             <Text style={styles.message}>{result.color.message}</Text>
-            <Text style={styles.subline}>把这份颜色留给今天的自己。</Text>
+            <Text style={styles.subline}>小羊卷说：把这份颜色放进今天的口袋。</Text>
             <Pressable style={styles.shareBtn} onPress={onShare}>
-              <Text style={styles.shareText}>分享幸运色</Text>
+              <Text style={styles.shareText}>分享这份可爱好运</Text>
             </Pressable>
           </Animated.View>
         ) : (
@@ -358,9 +341,7 @@ export function LuckyWheelScreen() {
         <Text style={styles.statText}>累计抽取：{stats.totalDraws}</Text>
         <Text style={styles.statText}>连续天数：{stats.streakDays}</Text>
         <Text style={styles.statText}>颜色种类：{stats.uniqueColors}</Text>
-        {stats.topColor ? (
-          <Text style={styles.statText}>最常出现：{stats.topColor.name}（{stats.topColor.count}次）</Text>
-        ) : null}
+        {stats.topColor ? <Text style={styles.statText}>最常出现：{stats.topColor.name}（{stats.topColor.count}次）</Text> : null}
       </View>
 
       <View style={styles.historyCard}>
@@ -383,18 +364,46 @@ export function LuckyWheelScreen() {
 
 const styles = StyleSheet.create({
   page: {
-    paddingBottom: 24,
-    alignItems: "center"
+    paddingBottom: 28,
+    paddingHorizontal: 12,
+    backgroundColor: "#F7F7FC"
+  },
+  heroCard: {
+    marginTop: 8,
+    marginBottom: 12,
+    borderRadius: 18,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E7ECFA",
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12
+  },
+  heroIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 14
+  },
+  title: {
+    fontSize: 19,
+    fontWeight: "800",
+    color: "#213254"
+  },
+  subtitle: {
+    marginTop: 2,
+    color: "#6A7EA4",
+    fontSize: 13
   },
   ritualLine: {
     width: "100%",
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#D8E1F1",
-    backgroundColor: "#F8FBFF",
-    color: "#4A5D84",
+    borderColor: "#DDE7FA",
+    backgroundColor: "#FBFDFF",
+    color: "#4A5F88",
     marginBottom: 10,
     lineHeight: 20
   },
@@ -402,42 +411,50 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     gap: 8,
-    marginBottom: 10
+    marginBottom: 12
   },
   modeBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#D5DDED",
+    borderColor: "#D5DEEE",
     backgroundColor: "#FFFFFF"
   },
   modeBtnActive: {
-    backgroundColor: "#1F2A44",
-    borderColor: "#1F2A44"
+    backgroundColor: "#2F4B8A",
+    borderColor: "#2F4B8A"
   },
   modeText: {
-    color: "#30405F"
+    color: "#30405F",
+    fontWeight: "700"
   },
   modeTextActive: {
     color: "#FFFFFF"
   },
+  wheelCard: {
+    width: "100%",
+    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E8ECF8",
+    marginBottom: 12,
+    paddingVertical: 10
+  },
   wheelBlock: {
-    marginTop: 6,
-    marginBottom: 16,
     alignItems: "center",
     justifyContent: "center"
   },
   pointer: {
     width: 0,
     height: 0,
-    borderLeftWidth: 12,
-    borderRightWidth: 12,
-    borderBottomWidth: 22,
+    borderLeftWidth: 11,
+    borderRightWidth: 11,
+    borderBottomWidth: 20,
     borderStyle: "solid",
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderBottomColor: "#1F2A44",
+    borderBottomColor: "#2B457D",
     marginBottom: -4,
     zIndex: 2
   },
@@ -454,7 +471,7 @@ const styles = StyleSheet.create({
     borderRadius: (WHEEL_SIZE + 30) / 2,
     alignItems: "center",
     justifyContent: "center",
-    opacity: 0.38
+    opacity: 0.42
   },
   orbitWrapActive: {
     opacity: 0.95
@@ -464,7 +481,7 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: (WHEEL_SIZE + 30) / 2,
     borderWidth: 1,
-    borderColor: "rgba(76, 131, 235, 0.28)"
+    borderColor: "rgba(107, 157, 237, 0.30)"
   },
   orbitDotCarrier: {
     position: "absolute",
@@ -473,12 +490,12 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   orbitDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginTop: -4,
-    backgroundColor: "#7BB3FF",
-    shadowColor: "#5A9BFF",
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginTop: -3,
+    backgroundColor: "#9DC6FF",
+    shadowColor: "#77A9F4",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.55,
     shadowRadius: 8
@@ -497,26 +514,28 @@ const styles = StyleSheet.create({
     width: 108,
     height: 108,
     borderRadius: 54,
-    backgroundColor: "#3E7BEE",
+    backgroundColor: "#4D80E8",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#3E7BEE",
+    shadowColor: "#4D80E8",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16
   },
   centerBtnDisabled: {
-    opacity: 0.88
+    opacity: 0.9
   },
   centerText: {
     color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: "700"
+    fontWeight: "800"
   },
   card: {
     width: "100%",
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E8ECF8",
     padding: 16,
     marginBottom: 12
   },
@@ -524,12 +543,14 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E8ECF8",
     padding: 16
   },
   cardTitle: {
     fontSize: 17,
-    fontWeight: "700",
-    color: "#1F2A44",
+    fontWeight: "800",
+    color: "#233457",
     marginBottom: 10
   },
   swatchWrap: {
@@ -542,14 +563,14 @@ const styles = StyleSheet.create({
   swatch: {
     width: 56,
     height: 56,
-    borderRadius: 12,
+    borderRadius: 14,
     zIndex: 1
   },
   swatchPulse: {
     position: "absolute",
     width: 56,
     height: 56,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 2
   },
   colorName: {
@@ -559,7 +580,7 @@ const styles = StyleSheet.create({
   },
   hex: {
     fontSize: 14,
-    color: "#61708B",
+    color: "#62708C",
     marginBottom: 6
   },
   moodTag: {
@@ -574,12 +595,12 @@ const styles = StyleSheet.create({
   },
   subline: {
     marginTop: 8,
-    color: "#667794"
+    color: "#6E7FA1"
   },
   shareBtn: {
     marginTop: 10,
     alignSelf: "flex-start",
-    backgroundColor: "#1F2A44",
+    backgroundColor: "#2D467D",
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12
@@ -614,4 +635,3 @@ const styles = StyleSheet.create({
     color: "#6A7791"
   }
 });
-
