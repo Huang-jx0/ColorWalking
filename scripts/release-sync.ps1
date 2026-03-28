@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Resolve-Path (Join-Path $scriptDir '..')
@@ -9,6 +9,7 @@ $env:COREPACK_HOME = Join-Path $root '.corepack'
 $env:TEMP = $tmpDir
 $env:TMP = $tmpDir
 $env:npm_config_ignore_scripts = 'true'
+$env:NODE_OPTIONS = '--dns-result-order=ipv4first'
 if (-not $env:GIT_CONFIG_GLOBAL -and $env:USERPROFILE) {
   $env:GIT_CONFIG_GLOBAL = Join-Path $env:USERPROFILE '.gitconfig'
 }
@@ -20,6 +21,28 @@ function Invoke-Step {
   Invoke-Expression $Command
   if ($LASTEXITCODE -ne 0) {
     throw "Command failed: $Command"
+  }
+}
+
+function Invoke-StepWithRetry {
+  param(
+    [Parameter(Mandatory = $true)][string]$Command,
+    [int]$MaxAttempts = 3,
+    [int]$BaseSleepSeconds = 6
+  )
+
+  for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+    try {
+      Invoke-Step $Command
+      return
+    } catch {
+      if ($attempt -ge $MaxAttempts) {
+        throw
+      }
+      $wait = $BaseSleepSeconds * $attempt
+      Write-Host "Command failed on attempt $attempt/$MaxAttempts, retrying in $wait seconds..."
+      Start-Sleep -Seconds $wait
+    }
   }
 }
 
@@ -102,7 +125,7 @@ Ensure-CleanWorktree
 
 Write-Host 'Step 1/7: verify Expo login'
 Set-Location $root
-Invoke-Step "corepack pnpm dlx eas-cli whoami"
+Invoke-StepWithRetry "corepack pnpm dlx eas-cli whoami" -MaxAttempts 2
 
 Write-Host 'Step 2/7: capture release commit'
 $releaseCommit = (git -C $root rev-parse HEAD).Trim()
@@ -110,9 +133,23 @@ Write-Host "[release] commit = $releaseCommit"
 
 Write-Host 'Step 3/7: trigger Android APK build'
 Set-Location $mobileDir
-$buildRaw = corepack pnpm dlx eas-cli build -p android --profile preview --non-interactive --json
-if ($LASTEXITCODE -ne 0) {
-  throw 'Failed to trigger EAS build'
+$buildRaw = $null
+$buildCommand = "corepack pnpm dlx eas-cli build -p android --profile preview --non-interactive --json"
+for ($i = 1; $i -le 3; $i++) {
+  try {
+    $buildRaw = Invoke-Expression $buildCommand
+    if ($LASTEXITCODE -eq 0 -and $buildRaw) {
+      break
+    }
+    throw 'Empty build output'
+  } catch {
+    if ($i -ge 3) {
+      throw 'Failed to trigger EAS build after retries'
+    }
+    $wait = 8 * $i
+    Write-Host "EAS build upload failed (attempt $i/3), retrying in $wait seconds..."
+    Start-Sleep -Seconds $wait
+  }
 }
 
 $buildObj = $buildRaw | ConvertFrom-Json
