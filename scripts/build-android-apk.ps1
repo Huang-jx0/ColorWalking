@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Resolve-Path (Join-Path $scriptDir '..')
@@ -48,3 +48,4 @@ Set-Location (Join-Path $root 'apps\mobile')
 Invoke-StepWithRetry "corepack pnpm dlx eas-cli build -p android --profile preview --non-interactive"
 
 Write-Host 'Step 3/3: build submitted. open the printed URL to download APK.'
+

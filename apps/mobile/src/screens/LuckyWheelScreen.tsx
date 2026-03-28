@@ -24,10 +24,17 @@ import { WheelGraphic } from "../components/WheelGraphic";
 const HISTORY_KEY = "colorwalking.history.v1";
 const RITUAL_KEY = "colorwalking.mobile.ritual.v1";
 const WHEEL_SIZE = 300;
+const APP_BASE_ROUNDS = 9;
+const APP_EXTRA_ROUNDS = 4;
+const APP_BASE_DURATION = 3600;
+const APP_EXTRA_DURATION = 1100;
+const REVEAL_SETTLE_MS = 520;
+const COMPANION_COOLDOWN_MS = 1800;
+const ORBIT_SPIN_MS = 660;
 
 type DrawMode = "random" | "daily";
 type RitualState = "idle" | "spinning" | "revealing";
-type CompanionPhase = "enter" | "idle" | "anticipate" | "happy" | "comfort";
+type CompanionPhase = "enter" | "idle" | "anticipate" | "revealing" | "happy" | "comfort";
 
 type RitualStore = {
   dayKey: string;
@@ -47,7 +54,12 @@ async function loadRitual(): Promise<RitualStore | null> {
 export function LuckyWheelScreen() {
   const engine = useMemo(() => createDrawEngine(COLOR_PALETTE), []);
   const rotate = useRef(new Animated.Value(0)).current;
+  const revealAnim = useRef(new Animated.Value(0)).current;
+  const orbitSpin = useRef(new Animated.Value(0)).current;
+  const orbitLoopRef = useRef<Animated.CompositeAnimation | null>(null);
   const totalAngle = useRef(0);
+  const revealSettleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const companionCooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [mode, setMode] = useState<DrawMode>("daily");
   const [ritualState, setRitualState] = useState<RitualState>("idle");
@@ -58,6 +70,7 @@ export function LuckyWheelScreen() {
   const [historyAll, setHistoryAll] = useState<DrawResult[]>([]);
   const [companionPhase, setCompanionPhase] = useState<CompanionPhase>("enter");
 
+  const busy = ritualState !== "idle";
   const spinning = ritualState === "spinning";
   const history = historyAll.slice(0, 5);
   const stats = useMemo(() => computeHistoryStats(historyAll), [historyAll]);
@@ -91,13 +104,36 @@ export function LuckyWheelScreen() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!spinning && result) {
-        setCompanionPhase("comfort");
-      }
-    }, 18000);
-    return () => clearTimeout(timer);
-  }, [spinning, result?.id]);
+    if (spinning) {
+      orbitSpin.setValue(0);
+      orbitLoopRef.current = Animated.loop(
+        Animated.timing(orbitSpin, {
+          toValue: 1,
+          duration: ORBIT_SPIN_MS,
+          easing: Easing.linear,
+          useNativeDriver: true
+        })
+      );
+      orbitLoopRef.current.start();
+    } else {
+      orbitLoopRef.current?.stop();
+      orbitSpin.stopAnimation(() => {
+        orbitSpin.setValue(0);
+      });
+    }
+
+    return () => {
+      orbitLoopRef.current?.stop();
+    };
+  }, [orbitSpin, spinning]);
+
+  useEffect(() => {
+    return () => {
+      if (revealSettleTimerRef.current) clearTimeout(revealSettleTimerRef.current);
+      if (companionCooldownTimerRef.current) clearTimeout(companionCooldownTimerRef.current);
+      orbitLoopRef.current?.stop();
+    };
+  }, []);
 
   const persistHistory = useCallback(async (next: DrawResult[]) => {
     const keep = next.slice(0, 100);
@@ -106,7 +142,10 @@ export function LuckyWheelScreen() {
   }, []);
 
   const spin = useCallback(async () => {
-    if (spinning) return;
+    if (busy) return;
+
+    if (revealSettleTimerRef.current) clearTimeout(revealSettleTimerRef.current);
+    if (companionCooldownTimerRef.current) clearTimeout(companionCooldownTimerRef.current);
 
     const todayKey = formatDayKey(new Date());
     const ritual = await loadRitual();
@@ -128,8 +167,8 @@ export function LuckyWheelScreen() {
 
     const sector = 360 / engine.palette.length;
     const targetCenter = draw.index * sector + sector / 2;
-    const rounds = 8 + Math.floor(Math.random() * 4);
-    const duration = 3400 + Math.floor(Math.random() * 1200);
+    const rounds = APP_BASE_ROUNDS + Math.floor(Math.random() * APP_EXTRA_ROUNDS);
+    const duration = APP_BASE_DURATION + Math.floor(Math.random() * APP_EXTRA_DURATION);
     const nextAngle = totalAngle.current + rounds * 360 + (360 - targetCenter);
 
     Animated.timing(rotate, {
@@ -142,8 +181,16 @@ export function LuckyWheelScreen() {
       rotate.setValue(totalAngle.current);
 
       setRitualState("revealing");
-      setRitualLine("结果出来了，收下这份属于今天的温柔。\n");
+      setCompanionPhase("revealing");
+      setRitualLine("结果出来了，收下这份属于今天的温柔。");
       setResult(draw);
+      revealAnim.setValue(0);
+      Animated.timing(revealAnim, {
+        toValue: 1,
+        duration: 520,
+        easing: Easing.bezier(0.22, 0.8, 0.22, 1),
+        useNativeDriver: true
+      }).start();
 
       const existingTodayIndex = historyAll.findIndex((x) => x.dayKey === draw.dayKey);
       let nextHistory = [...historyAll];
@@ -154,17 +201,19 @@ export function LuckyWheelScreen() {
       }
 
       await persistHistory(nextHistory);
-      setCompanionPhase("happy");
-
-      setTimeout(() => {
+      revealSettleTimerRef.current = setTimeout(() => {
         setRitualState("idle");
         const line = RITUAL_LINES[Math.floor(Math.random() * RITUAL_LINES.length)] ?? RITUAL_LINES[0];
         setRitualLine(line);
-      }, 480);
+        setCompanionPhase("happy");
+      }, REVEAL_SETTLE_MS);
 
-      setTimeout(() => setCompanionPhase(mode === "daily" ? "comfort" : "idle"), 2200);
+      companionCooldownTimerRef.current = setTimeout(
+        () => setCompanionPhase(mode === "daily" ? "comfort" : "idle"),
+        REVEAL_SETTLE_MS + COMPANION_COOLDOWN_MS
+      );
     });
-  }, [engine, historyAll, mode, persistHistory, rotate, spinning]);
+  }, [busy, engine, historyAll, mode, persistHistory, revealAnim, rotate]);
 
   const onShare = useCallback(async () => {
     if (!result) return;
@@ -184,11 +233,54 @@ export function LuckyWheelScreen() {
     ]
   };
 
+  const orbitSpinStyle = {
+    transform: [
+      {
+        rotate: orbitSpin.interpolate({
+          inputRange: [0, 1],
+          outputRange: ["0deg", "360deg"]
+        })
+      }
+    ]
+  };
+
   const centerLabel = spinning
     ? "揭晓中"
-    : mode === "daily" && todayCached
-      ? "再看今日色"
-      : "开始抽色";
+    : ritualState === "revealing"
+      ? "结果揭晓"
+      : mode === "daily" && todayCached
+        ? "再看今日色"
+        : "开始抽色";
+
+  const revealStyle = {
+    opacity: revealAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.7, 1]
+    }),
+    transform: [
+      {
+        scale: revealAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.96, 1]
+        })
+      }
+    ]
+  };
+
+  const revealPulseStyle = {
+    opacity: revealAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.36, 0]
+    }),
+    transform: [
+      {
+        scale: revealAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.88, 1.35]
+        })
+      }
+    ]
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.page}>
@@ -198,6 +290,7 @@ export function LuckyWheelScreen() {
 
       <View style={styles.modeRow}>
         <Pressable
+          disabled={busy}
           onPress={() => {
             setMode("daily");
             if (ritualState === "idle") {
@@ -209,6 +302,7 @@ export function LuckyWheelScreen() {
           <Text style={[styles.modeText, mode === "daily" && styles.modeTextActive]}>今日模式</Text>
         </Pressable>
         <Pressable
+          disabled={busy}
           onPress={() => {
             setMode("random");
             if (ritualState === "idle") setRitualLine(MODE_RITUAL_LINE.random());
@@ -221,11 +315,17 @@ export function LuckyWheelScreen() {
 
       <View style={styles.wheelBlock}>
         <View style={styles.pointer} />
-        <Pressable style={styles.wheelPressable} onPress={() => void spin()}>
+        <Pressable style={styles.wheelPressable} onPress={() => void spin()} disabled={busy}>
+          <View pointerEvents="none" style={[styles.orbitWrap, spinning && styles.orbitWrapActive]}>
+            <View style={styles.orbitTrack} />
+            <Animated.View style={[styles.orbitDotCarrier, orbitSpinStyle]}>
+              <View style={styles.orbitDot} />
+            </Animated.View>
+          </View>
           <Animated.View style={[styles.wheelSurface, spinStyle]}>
             <WheelGraphic size={WHEEL_SIZE} colors={engine.palette} />
           </Animated.View>
-          <Pressable style={styles.centerBtn} onPress={() => void spin()}>
+          <Pressable style={[styles.centerBtn, busy && styles.centerBtnDisabled]} onPress={() => void spin()} disabled={busy}>
             <Text style={styles.centerText}>{centerLabel}</Text>
           </Pressable>
         </Pressable>
@@ -234,8 +334,11 @@ export function LuckyWheelScreen() {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>今日幸运色</Text>
         {result ? (
-          <>
-            <View style={[styles.swatch, { backgroundColor: result.color.hex }]} />
+          <Animated.View style={revealStyle}>
+            <View style={styles.swatchWrap}>
+              <Animated.View style={[styles.swatchPulse, { borderColor: result.color.hex }, revealPulseStyle]} />
+              <View style={[styles.swatch, { backgroundColor: result.color.hex }]} />
+            </View>
             <Text style={styles.colorName}>{result.color.name}</Text>
             <Text style={styles.hex}>{result.color.hex}</Text>
             {result.color.moodTag ? <Text style={styles.moodTag}>情绪关键词：{result.color.moodTag}</Text> : null}
@@ -244,7 +347,7 @@ export function LuckyWheelScreen() {
             <Pressable style={styles.shareBtn} onPress={onShare}>
               <Text style={styles.shareText}>分享幸运色</Text>
             </Pressable>
-          </>
+          </Animated.View>
         ) : (
           <Text style={styles.placeholder}>点一下转盘，收下今天的小小光亮。</Text>
         )}
@@ -344,6 +447,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
+  orbitWrap: {
+    position: "absolute",
+    width: WHEEL_SIZE + 30,
+    height: WHEEL_SIZE + 30,
+    borderRadius: (WHEEL_SIZE + 30) / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.38
+  },
+  orbitWrapActive: {
+    opacity: 0.95
+  },
+  orbitTrack: {
+    width: "100%",
+    height: "100%",
+    borderRadius: (WHEEL_SIZE + 30) / 2,
+    borderWidth: 1,
+    borderColor: "rgba(76, 131, 235, 0.28)"
+  },
+  orbitDotCarrier: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    alignItems: "center"
+  },
+  orbitDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginTop: -4,
+    backgroundColor: "#7BB3FF",
+    shadowColor: "#5A9BFF",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.55,
+    shadowRadius: 8
+  },
   wheelSurface: {
     width: WHEEL_SIZE,
     height: WHEEL_SIZE,
@@ -365,6 +504,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16
+  },
+  centerBtnDisabled: {
+    opacity: 0.88
   },
   centerText: {
     color: "#FFFFFF",
@@ -390,11 +532,25 @@ const styles = StyleSheet.create({
     color: "#1F2A44",
     marginBottom: 10
   },
+  swatchWrap: {
+    width: 56,
+    height: 56,
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center"
+  },
   swatch: {
     width: 56,
     height: 56,
     borderRadius: 12,
-    marginBottom: 10
+    zIndex: 1
+  },
+  swatchPulse: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 2
   },
   colorName: {
     fontSize: 22,

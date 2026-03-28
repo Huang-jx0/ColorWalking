@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 
-type CompanionPhase = "enter" | "idle" | "anticipate" | "happy" | "comfort";
+type CompanionPhase = "enter" | "idle" | "anticipate" | "revealing" | "happy" | "comfort";
 
 type CompanionProps = {
   phase: CompanionPhase;
@@ -12,6 +12,7 @@ const MESSAGE_POOL: Record<CompanionPhase, string[]> = {
   enter: ["小羊卷来陪你了。"],
   idle: ["今天也慢慢来，我们先看看颜色。", "我在这儿，陪你抽一份小幸运。"],
   anticipate: ["准备好了，我和你一起等结果。"],
+  revealing: ["快看快看，结果要出来了。", "小羊卷正在给你揭晓今天的颜色。"],
   happy: ["这份颜色很适合你。", "收到啦，今天的颜色到了。"],
   comfort: ["辛苦了，记得也对自己温柔一点。", "不用着急，慢慢走也很好。"]
 };
