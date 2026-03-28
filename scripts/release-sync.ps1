@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Resolve-Path (Join-Path $scriptDir '..')
@@ -123,9 +123,11 @@ Ensure-ExpoToken
 Ensure-GitSafeDirectory
 Ensure-CleanWorktree
 
-Write-Host 'Step 1/7: verify Expo login'
-Set-Location $root
-Invoke-StepWithRetry "corepack pnpm dlx eas-cli whoami" -MaxAttempts 2
+Write-Host 'Step 1/7: check Expo token'
+if (-not $env:EXPO_TOKEN) {
+  throw 'EXPO_TOKEN missing in current session.'
+}
+Write-Host '[expo] EXPO_TOKEN loaded. skip whoami to avoid CLI hang.'
 
 Write-Host 'Step 2/7: capture release commit'
 $releaseCommit = (git -C $root rev-parse HEAD).Trim()
