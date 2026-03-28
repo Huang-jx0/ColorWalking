@@ -4,6 +4,7 @@ import { LuckyWheelScreen } from "./src/screens/LuckyWheelScreen";
 import { OracleScreen } from "./src/screens/OracleScreen";
 import { PetScreen } from "./src/screens/PetScreen";
 import { DownloadScreen } from "./src/screens/DownloadScreen";
+import { CHIBI_THEME } from "../../packages/chibi-ui/src";
 
 type TabKey = "wheel" | "oracle" | "pet" | "download";
 
@@ -12,7 +13,7 @@ const TABS: Array<{ key: TabKey; label: string }> = [
   { key: "oracle", label: "时色签" },
   { key: "pet", label: "小羊卷" },
   { key: "download", label: "下载" }
-];
+] as const;
 
 export default function App() {
   const [tab, setTab] = useState<TabKey>("wheel");
@@ -57,7 +58,7 @@ export default function App() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F4F6FB"
+    backgroundColor: CHIBI_THEME.color.pageBg
   },
   container: {
     flex: 1,
@@ -67,13 +68,13 @@ const styles = StyleSheet.create({
   brand: {
     fontSize: 38,
     fontWeight: "900",
-    color: "#1F2A44"
+    color: CHIBI_THEME.color.textStrong
   },
   subtitle: {
     marginTop: 4,
     marginBottom: 10,
     fontSize: 15,
-    color: "#62708A"
+    color: CHIBI_THEME.color.textSoft
   },
   content: {
     flex: 1
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
   },
   tabBtn: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: CHIBI_THEME.radius.pill,
     borderWidth: 1,
     borderColor: "#D6DEEE",
     backgroundColor: "#FFFFFF",
@@ -93,14 +94,15 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   tabBtnActive: {
-    backgroundColor: "#2F4B8A",
-    borderColor: "#2F4B8A"
+    backgroundColor: CHIBI_THEME.color.primary,
+    borderColor: CHIBI_THEME.color.primary
   },
   tabText: {
-    color: "#425472",
+    color: CHIBI_THEME.color.textNormal,
     fontWeight: "700"
   },
   tabTextActive: {
     color: "#FFFFFF"
   }
 });
+

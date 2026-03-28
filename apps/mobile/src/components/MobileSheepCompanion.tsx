@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
+import { CHIBI_THEME, CHIBI_PET_PARTS } from "../../../../packages/chibi-ui/src";
 
 type CompanionPhase = "enter" | "idle" | "anticipate" | "revealing" | "happy" | "comfort";
 
@@ -132,10 +133,10 @@ const styles = StyleSheet.create({
   petShell: {
     width: 74,
     height: 84,
-    borderRadius: 24,
-    backgroundColor: "#FFF9F3",
+    borderRadius: CHIBI_THEME.radius.avatar,
+    backgroundColor: CHIBI_THEME.color.petCream,
     borderWidth: 1,
-    borderColor: "#F0E3D8",
+    borderColor: CHIBI_PET_PARTS.shellBorder,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#ECE3D8",
+    borderColor: CHIBI_PET_PARTS.headBorder,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 18,
     borderRadius: 6,
-    backgroundColor: "#F5EDE0",
+    backgroundColor: CHIBI_PET_PARTS.earOuter,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 18,
     borderRadius: 6,
-    backgroundColor: "#F5EDE0",
+    backgroundColor: CHIBI_PET_PARTS.earOuter,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: "#2A3A62",
+    backgroundColor: CHIBI_PET_PARTS.eye,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     width: 9,
     height: 3,
     borderRadius: 2,
-    backgroundColor: "#2A3A62"
+    backgroundColor: CHIBI_PET_PARTS.eye
   },
   blushLeft: {
     position: "absolute",
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#F7B8C8"
+    backgroundColor: CHIBI_THEME.color.petPink
   },
   blushRight: {
     position: "absolute",
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#F7B8C8"
+    backgroundColor: CHIBI_THEME.color.petPink
   },
   nose: {
     position: "absolute",
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#2A3A62"
+    backgroundColor: CHIBI_PET_PARTS.nose
   },
   mouth: {
     position: "absolute",
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 6,
     borderWidth: 2,
     borderTopWidth: 0,
-    borderColor: "#2A3A62"
+    borderColor: CHIBI_PET_PARTS.nose
   },
   scarf: {
     position: "absolute",
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 10,
     borderRadius: 6,
-    backgroundColor: "#8FC4FF"
+    backgroundColor: CHIBI_THEME.color.petBlue
   },
   tag: {
     position: "absolute",
@@ -255,11 +256,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 14,
     borderRadius: 3,
-    backgroundColor: "#78C888"
+    backgroundColor: CHIBI_THEME.color.petTag
   },
   badge: {
     height: 28,
-    borderRadius: 14,
+    borderRadius: CHIBI_THEME.radius.pill,
     paddingHorizontal: 12,
     alignItems: "center",
     justifyContent: "center",
@@ -274,15 +275,15 @@ const styles = StyleSheet.create({
   },
   bubble: {
     marginTop: 10,
-    borderRadius: 14,
+    borderRadius: CHIBI_THEME.radius.pill,
     borderWidth: 1,
-    borderColor: "#DEE8FA",
-    backgroundColor: "#FBFDFF",
+    borderColor: CHIBI_THEME.color.bubbleBorder,
+    backgroundColor: CHIBI_THEME.color.bubbleBg,
     paddingVertical: 10,
     paddingHorizontal: 12
   },
   message: {
-    color: "#445A82",
+    color: CHIBI_THEME.color.textNormal,
     fontSize: 14,
     lineHeight: 20
   }
