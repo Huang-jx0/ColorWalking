@@ -1,4 +1,4 @@
-{
+﻿{
   "expo": {
     "name": "ColorWalking",
     "slug": "colorwalking",
@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon-foreground.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#F4F6FB"
       },
       "package": "com.colorwalking.app"
@@ -33,3 +33,4 @@
     "owner": "junxionghuang"
   }
 }
+

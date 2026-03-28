@@ -25,7 +25,6 @@ const NAV_ITEMS = [
 export function App() {
   const [activeSection, setActiveSection] = useState("");
   const [copiedId, setCopiedId] = useState<string>("");
-  const [downloadOpening, setDownloadOpening] = useState(false);
 
   const isDownloadRoute = useMemo(() => {
     const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -60,13 +59,6 @@ export function App() {
     }
     setCopiedId(id);
     window.setTimeout(() => setCopiedId(""), 1400);
-  };
-
-  const onDownloadApp = () => {
-    if (downloadOpening) return;
-    setDownloadOpening(true);
-    window.open(ANDROID_APK_URL, "_blank", "noopener,noreferrer");
-    window.setTimeout(() => setDownloadOpening(false), 1200);
   };
 
   return (
@@ -177,17 +169,15 @@ export function App() {
         <h2>下载 Android App</h2>
         <p>支持浏览器直接下载 APK。下载入口已统一为品牌化路径，后续可无缝更新版本。</p>
         <div className="apk-actions">
-          <button type="button" className="cta cta-button" onClick={onDownloadApp} disabled={downloadOpening}>
-            {downloadOpening ? "正在打开下载..." : "下载 Android 版"}
-          </button>
-          <a className="ghost-btn" href={APK_MIRROR_URL} target="_blank" rel="noreferrer">
+          <a className="cta cta-button" href={ANDROID_APK_URL} download>下载 Android APK</a>
+          <a className="ghost-btn" href={APK_MIRROR_URL} download>
             站内下载入口
           </a>
           <a className="ghost-btn" href={DOWNLOAD_PAGE_PATH}>
             打开品牌下载页
           </a>
         </div>
-        <p className="apk-note">默认优先使用 `VITE_ANDROID_APK_URL`，未配置时回退到站内下载路径。</p>
+        <p className="apk-note">下载链接固定为站内直链，并附带版本参数避免手机缓存命中旧包。</p>
       </section>
 
       <footer className="footer">

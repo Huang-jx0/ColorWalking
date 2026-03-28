@@ -2,20 +2,12 @@
 import { ANDROID_APK_URL, APK_MIRROR_URL } from "./config/experience";
 
 export function DownloadPage() {
-  const [opening, setOpening] = useState(false);
   const [copied, setCopied] = useState(false);
   const version = useMemo(() => import.meta.env.VITE_APP_VERSION ?? "v1.0.0", []);
   const updatedAt = useMemo(
     () => import.meta.env.VITE_BUILD_TIME ?? new Date().toISOString().slice(0, 16).replace("T", " "),
     []
   );
-
-  const onDownload = () => {
-    if (opening) return;
-    setOpening(true);
-    window.open(ANDROID_APK_URL, "_blank", "noopener,noreferrer");
-    window.setTimeout(() => setOpening(false), 1200);
-  };
 
   const onCopy = async () => {
     try {
@@ -39,10 +31,10 @@ export function DownloadPage() {
             体验保持同一套温柔节奏。
           </p>
           <div className="apk-actions">
-            <button type="button" className="cta cta-button" onClick={onDownload} disabled={opening}>
-              {opening ? "正在打开下载..." : "下载 Android 版"}
-            </button>
-            <a className="ghost-btn" href={APK_MIRROR_URL} target="_blank" rel="noreferrer">
+            <a className="cta cta-button" href={ANDROID_APK_URL} download>
+              下载 Android APK
+            </a>
+            <a className="ghost-btn" href={APK_MIRROR_URL} download>
               站内镜像下载
             </a>
             <button type="button" className="ghost-btn" onClick={onCopy}>
@@ -61,7 +53,7 @@ export function DownloadPage() {
         <div className="grid">
           <article>
             <h3>1. 下载 APK</h3>
-            <p>点击上方“下载 Android 版”，在浏览器中完成 APK 下载。</p>
+            <p>点击上方“下载 Android APK”，在浏览器中完成 APK 下载。</p>
           </article>
           <article>
             <h3>2. 允许安装</h3>

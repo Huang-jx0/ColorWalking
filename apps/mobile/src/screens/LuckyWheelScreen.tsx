@@ -200,7 +200,7 @@ export function LuckyWheelScreen() {
         nextHistory = [draw, ...nextHistory];
       }
 
-      await persistHistory(nextHistory);
+      void persistHistory(nextHistory);
       revealSettleTimerRef.current = setTimeout(() => {
         setRitualState("idle");
         const line = RITUAL_LINES[Math.floor(Math.random() * RITUAL_LINES.length)] ?? RITUAL_LINES[0];
@@ -614,3 +614,4 @@ const styles = StyleSheet.create({
     color: "#6A7791"
   }
 });
+
