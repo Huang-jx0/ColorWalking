@@ -100,27 +100,66 @@ function Invoke-CommandWithTimeoutRetry {
       throw "Failed to start command: $Command"
     }
 
-    $timedOut = -not $p.WaitForExit($TimeoutSeconds * 1000)
-    if ($timedOut) {
-      try { $p.Kill() } catch {}
-      try { $p.WaitForExit() } catch {}
-      Write-Host "[timeout] command exceeded ${TimeoutSeconds}s and was terminated."
-      if ($attempt -ge $MaxAttempts) {
-        throw "Command timed out after $MaxAttempts attempts: $Command"
+    $outBuilder = New-Object System.Text.StringBuilder
+    $errBuilder = New-Object System.Text.StringBuilder
+    $state = [hashtable]::Synchronized(@{
+      LastOutputAt = Get-Date
+      LastHeartbeatAt = Get-Date
+    })
+
+    $outHandler = [System.Diagnostics.DataReceivedEventHandler]{
+      param($sender, $e)
+      if ($null -ne $e.Data) {
+        [void]$outBuilder.AppendLine($e.Data)
+        Write-Host $e.Data
+        $state.LastOutputAt = Get-Date
       }
-      $sleep = $BaseSleepSeconds * $attempt
-      Write-Host "[retry] restart in ${sleep}s..."
-      Start-Sleep -Seconds $sleep
-      continue
+    }
+    $errHandler = [System.Diagnostics.DataReceivedEventHandler]{
+      param($sender, $e)
+      if ($null -ne $e.Data) {
+        [void]$errBuilder.AppendLine($e.Data)
+        Write-Host $e.Data
+        $state.LastOutputAt = Get-Date
+      }
     }
 
-    $stdout = $p.StandardOutput.ReadToEnd()
-    $stderr = $p.StandardError.ReadToEnd()
+    $p.add_OutputDataReceived($outHandler)
+    $p.add_ErrorDataReceived($errHandler)
+    $p.BeginOutputReadLine()
+    $p.BeginErrorReadLine()
 
-    if ($stdout) { Write-Host $stdout.TrimEnd() }
-    if ($stderr) { Write-Host $stderr.TrimEnd() }
+    $startAt = Get-Date
+    $timedOut = $false
+    while (-not $p.HasExited) {
+      Start-Sleep -Seconds 1
 
-    if ($p.ExitCode -eq 0) {
+      $elapsed = (Get-Date) - $startAt
+      if ($elapsed.TotalSeconds -ge $TimeoutSeconds) {
+        $timedOut = $true
+        try { $p.Kill() } catch {}
+        try { $p.WaitForExit() } catch {}
+        Write-Host "[timeout] command exceeded ${TimeoutSeconds}s and was terminated."
+        break
+      }
+
+      $silence = (Get-Date) - $state.LastOutputAt
+      $beatGap = (Get-Date) - $state.LastHeartbeatAt
+      if ($silence.TotalSeconds -ge 20 -and $beatGap.TotalSeconds -ge 15) {
+        Write-Host "[heartbeat] command still running ({0}s elapsed, no new output for {1}s)..." -f [int]$elapsed.TotalSeconds, [int]$silence.TotalSeconds
+        $state.LastHeartbeatAt = Get-Date
+      }
+    }
+
+    try { $p.CancelOutputRead() } catch {}
+    try { $p.CancelErrorRead() } catch {}
+    try { $p.remove_OutputDataReceived($outHandler) } catch {}
+    try { $p.remove_ErrorDataReceived($errHandler) } catch {}
+
+    $stdout = $outBuilder.ToString()
+    $stderr = $errBuilder.ToString()
+
+    if (-not $timedOut -and $p.ExitCode -eq 0) {
       if ($CaptureStdout) {
         return $stdout
       }
@@ -128,11 +167,14 @@ function Invoke-CommandWithTimeoutRetry {
     }
 
     if ($attempt -ge $MaxAttempts) {
+      if ($timedOut) {
+        throw "Command timed out after $MaxAttempts attempts: $Command"
+      }
       throw "Command failed after $MaxAttempts attempts: $Command"
     }
 
     $wait = $BaseSleepSeconds * $attempt
-    Write-Host "[retry] command failed, retry in ${wait}s..."
+    Write-Host "[retry] restart in ${wait}s..."
     Start-Sleep -Seconds $wait
   }
 }
@@ -242,4 +284,3 @@ try {
   Set-Location $root
   Restore-MobileAppConfigIfDirty
 }
-
