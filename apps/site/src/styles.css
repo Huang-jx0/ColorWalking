@@ -4916,3 +4916,75 @@ body {
     height: 12px;
   }
 }
+
+/* ===== Home Download Section Refinement ===== */
+.home-section-download {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-section-download::before {
+  content: "";
+  position: absolute;
+  right: -44px;
+  bottom: -58px;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(189, 217, 254, 0.28), rgba(189, 217, 254, 0));
+  pointer-events: none;
+}
+
+.home-download-bridge {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  border: 1px solid #d7e4f6;
+  border-radius: 999px;
+  background: #fff;
+  padding: 7px 12px;
+}
+
+.home-download-bridge span {
+  color: #4f6d97;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-download-bridge i {
+  color: #8aa5cb;
+  font-style: normal;
+  font-size: 12px;
+}
+
+.home-download-actions {
+  margin-top: 12px;
+}
+
+.home-download-main-cta {
+  min-width: 170px;
+}
+
+.home-download-note {
+  margin-top: 10px;
+  color: #667fa4;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .home-download-bridge {
+    border-radius: 12px;
+    padding: 8px 10px;
+  }
+
+  .home-download-bridge span,
+  .home-download-bridge i {
+    font-size: 11px;
+  }
+
+  .home-download-main-cta {
+    width: 100%;
+  }
+}

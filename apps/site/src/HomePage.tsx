@@ -95,15 +95,23 @@ export function HomePage({ WheelSection }: Props) {
       </section>
 
       <section className="section brand-panel tone-mist home-section-download" id="home-download-entry">
-        <h2>把羊卷岛带在身边</h2>
+        <h2>把今天的颜色，带在身边</h2>
         <p>
-          在手机上，也能随时领取今天的幸运颜色。
-          和小羊卷一起，把每天的小小治愈装进口袋里。
+          在手机上，你也可以继续领取今天的幸运颜色，和小羊卷保持同一份温柔节奏。
+          它不是一个额外任务，只是把这份轻陪伴，从网页自然延续到你的日常里。
         </p>
-        <div className="start-actions">
-          <a className="cta" href={DOWNLOAD_PAGE_PATH}>前往下载页</a>
+        <div className="home-download-bridge">
+          <span>网页抽色</span>
+          <i>→</i>
+          <span>小羊卷送达</span>
+          <i>→</i>
+          <span>App 随身陪伴</span>
+        </div>
+        <div className="start-actions home-download-actions">
+          <a className="cta home-download-main-cta" href={DOWNLOAD_PAGE_PATH}>下载 App</a>
           <a className="ghost-btn" href="/download/app.apk">直接下载 APK</a>
         </div>
+        <p className="home-download-note">官方路径：/download · Android 版本当前可用</p>
         <p className="home-next-step">最后看一眼：羊卷岛会如何继续长大。</p>
       </section>
 
