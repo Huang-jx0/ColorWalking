@@ -4706,3 +4706,83 @@ body {
     width: 100%;
   }
 }
+
+/* ===== Home Hero CTA Focus Boost ===== */
+.home-hero-actions {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.home-hero-main-cta {
+  position: relative;
+  isolation: isolate;
+  min-width: 252px;
+  min-height: 56px;
+  padding: 14px 26px;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  background: linear-gradient(180deg, #8fb7e3, #739bcf);
+  border-color: #6b93c6;
+  box-shadow:
+    0 20px 38px rgba(98, 135, 186, 0.44),
+    0 0 0 1px rgba(255, 255, 255, 0.32) inset;
+}
+
+.home-hero-main-cta::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -12px -14px -14px;
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 42%, rgba(143, 183, 227, 0.34), rgba(143, 183, 227, 0));
+  pointer-events: none;
+}
+
+.home-hero-main-cta:hover {
+  transform: translateY(-2px) scale(1.012);
+  box-shadow:
+    0 24px 42px rgba(98, 135, 186, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.34) inset;
+}
+
+.home-hero-main-cta:active {
+  transform: translateY(0) scale(0.988);
+  box-shadow:
+    0 12px 24px rgba(98, 135, 186, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.28) inset;
+}
+
+.home-hero-main-cta:focus-visible {
+  outline: 0;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 0 6px rgba(126, 169, 216, 0.56),
+    0 20px 38px rgba(98, 135, 186, 0.44);
+}
+
+.home-hero-sub-cta {
+  min-height: 46px;
+  padding: 10px 16px;
+}
+
+.home-focus-note {
+  margin-bottom: 12px;
+}
+
+.home-hero-context {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .home-hero-actions {
+    gap: 10px;
+  }
+
+  .home-hero-main-cta,
+  .home-hero-sub-cta {
+    width: 100%;
+  }
+}
