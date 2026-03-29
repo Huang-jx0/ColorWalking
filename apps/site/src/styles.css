@@ -4851,3 +4851,68 @@ body {
     font-size: 12px;
   }
 }
+
+/* ===== Home Rhythm Flow ===== */
+.home-focus-page .brand-panel {
+  position: relative;
+}
+
+.home-focus-page .brand-panel + .brand-panel::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -26px;
+  width: 2px;
+  height: 16px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(142, 177, 219, 0.55), rgba(142, 177, 219, 0));
+  pointer-events: none;
+}
+
+.home-next-step {
+  margin: 14px 0 0;
+  color: #5e7aa2;
+  font-size: 13px;
+  line-height: 1.6;
+  border-top: 1px dashed #d8e4f6;
+  padding-top: 10px;
+}
+
+.home-section-intro h2,
+.home-section-lucky h2,
+.home-section-ip h2,
+.home-section-world h2,
+.home-section-download h2,
+.home-section-future h2 {
+  margin-bottom: 12px;
+}
+
+.home-section-lucky .start-actions,
+.home-section-ip .start-actions,
+.home-section-download .start-actions,
+.home-section-future .start-actions {
+  margin-top: 12px;
+}
+
+.home-focus-page .section {
+  margin-top: 46px;
+}
+
+.home-focus-page .home-focus-hero {
+  margin-bottom: 4px;
+}
+
+.home-section-closing {
+  margin-top: 52px;
+}
+
+@media (max-width: 760px) {
+  .home-focus-page .section {
+    margin-top: 34px;
+  }
+
+  .home-focus-page .brand-panel + .brand-panel::before {
+    top: -20px;
+    height: 12px;
+  }
+}

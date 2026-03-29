@@ -47,6 +47,7 @@ export function HomePage({ WheelSection }: Props) {
           羊卷岛是一个围绕原创 IP小羊卷展开的陪伴品牌。
           我们从幸运色出发，把颜色、角色和日常陪伴连接在一起，想让每个人的生活里，多一点柔软，也多一点颜色。
         </p>
+        <p className="home-next-step">下一步：先领取今天的幸运颜色。</p>
       </section>
 
       <section className="section brand-panel tone-mist home-section-lucky" id="home-lucky-entry">
@@ -60,6 +61,7 @@ export function HomePage({ WheelSection }: Props) {
           <a className="ghost-btn" href="#play">进入网页转盘</a>
         </div>
         {WheelSection}
+        <p className="home-next-step">抽完之后，来认识把颜色送到你身边的小羊卷。</p>
       </section>
 
       <section className="section brand-panel tone-cream home-section-ip">
@@ -76,6 +78,7 @@ export function HomePage({ WheelSection }: Props) {
         <div className="start-actions" style={{ marginTop: 14 }}>
           <a className="ghost-btn" href="/xiaoyangjuan">进入小羊卷页面</a>
         </div>
+        <p className="home-next-step">继续往下看，它来自怎样的世界。</p>
       </section>
 
       <section className="section brand-panel tone-cloud home-section-world">
@@ -88,6 +91,7 @@ export function HomePage({ WheelSection }: Props) {
             <li key={item}>{item}</li>
           ))}
         </ul>
+        <p className="home-next-step">如果你想把这份陪伴带在身边，可以继续下载 App。</p>
       </section>
 
       <section className="section brand-panel tone-mist home-section-download" id="home-download-entry">
@@ -100,6 +104,7 @@ export function HomePage({ WheelSection }: Props) {
           <a className="cta" href={DOWNLOAD_PAGE_PATH}>前往下载页</a>
           <a className="ghost-btn" href="/download/app.apk">直接下载 APK</a>
         </div>
+        <p className="home-next-step">最后看一眼：羊卷岛会如何继续长大。</p>
       </section>
 
       <section className="section brand-panel tone-cream home-section-future">
