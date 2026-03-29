@@ -47,7 +47,7 @@ export function HomePage({ WheelSection }: Props) {
           羊卷岛是一个围绕原创 IP小羊卷展开的陪伴品牌。
           我们从幸运色出发，把颜色、角色和日常陪伴连接在一起，想让每个人的生活里，多一点柔软，也多一点颜色。
         </p>
-        <p className="home-next-step">下一步：先领取今天的幸运颜色。</p>
+        <p>从这一页开始，你会先遇见今天的颜色，再慢慢认识小羊卷和它所在的世界。</p>
       </section>
 
       <section className="section brand-panel tone-mist home-section-lucky" id="home-lucky-entry">
@@ -61,7 +61,7 @@ export function HomePage({ WheelSection }: Props) {
           <a className="ghost-btn" href="#play">进入网页转盘</a>
         </div>
         {WheelSection}
-        <p className="home-next-step">抽完之后，来认识把颜色送到你身边的小羊卷。</p>
+        <p className="home-lucky-note">抽完这一份颜色，再看看是谁把它送到你身边。</p>
       </section>
 
       <section className="section brand-panel tone-cream home-section-ip">
@@ -78,7 +78,7 @@ export function HomePage({ WheelSection }: Props) {
         <div className="start-actions" style={{ marginTop: 14 }}>
           <a className="ghost-btn" href="/xiaoyangjuan">进入小羊卷页面</a>
         </div>
-        <p className="home-next-step">继续往下看，它来自怎样的世界。</p>
+        <p className="home-ip-note">继续往下看，你会看到它来自怎样的颜色世界。</p>
       </section>
 
       <section className="section brand-panel tone-cloud home-section-world">
@@ -91,7 +91,7 @@ export function HomePage({ WheelSection }: Props) {
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <p className="home-next-step">如果你想把这份陪伴带在身边，可以继续下载 App。</p>
+        <p className="home-world-note">如果你想把这份陪伴带在身边，下一步可以进入 App。</p>
       </section>
 
       <section className="section brand-panel tone-mist home-section-download" id="home-download-entry">
@@ -100,19 +100,12 @@ export function HomePage({ WheelSection }: Props) {
           在手机上，你也可以继续领取今天的幸运颜色，和小羊卷保持同一份温柔节奏。
           它不是一个额外任务，只是把这份轻陪伴，从网页自然延续到你的日常里。
         </p>
-        <div className="home-download-bridge">
-          <span>网页抽色</span>
-          <i>→</i>
-          <span>小羊卷送达</span>
-          <i>→</i>
-          <span>App 随身陪伴</span>
-        </div>
         <div className="start-actions home-download-actions">
           <a className="cta home-download-main-cta" href={DOWNLOAD_PAGE_PATH}>下载 App</a>
           <a className="ghost-btn" href="/download/app.apk">直接下载 APK</a>
         </div>
         <p className="home-download-note">官方路径：/download · Android 版本当前可用</p>
-        <p className="home-next-step">最后看一眼：羊卷岛会如何继续长大。</p>
+        <p className="home-download-tail">最后看一眼：羊卷岛会如何继续长大。</p>
       </section>
 
       <section className="section brand-panel tone-cream home-section-future">
@@ -124,13 +117,6 @@ export function HomePage({ WheelSection }: Props) {
         <p className="home-future-note">
           当前阶段：以内容预告与品牌表达为主，不做售卖区。
         </p>
-        <div className="home-future-bridge">
-          <span>小羊卷角色</span>
-          <i>→</i>
-          <span>日常陪伴体验</span>
-          <i>→</i>
-          <span>未来周边形态</span>
-        </div>
         <div className="grid">
           {FUTURE_LABS.slice(0, 3).map((item) => (
             <article key={item.title}>
@@ -151,7 +137,7 @@ export function HomePage({ WheelSection }: Props) {
           <a className="ghost-btn" href="/future">查看更多未来计划</a>
           <a className="ghost-btn" href="/companion-plush">查看陪伴玩偶系列</a>
         </div>
-        <p className="home-next-step">这些预告会跟随品牌节奏逐步展开，而不是一次性堆满。</p>
+        <p className="home-future-tail">这些预告会跟随品牌节奏逐步展开，而不是一次性堆满。</p>
       </section>
 
       <section className="section brand-panel tone-mist brand-closing home-section-closing">
