@@ -4610,3 +4610,99 @@ body {
     border-radius: 10px;
   }
 }
+
+/* ===== Home Hero Rework V3 ===== */
+.home-focus-hero {
+  padding: 18px 0 14px;
+  gap: 36px;
+}
+
+.home-focus-hero::before {
+  top: -14px;
+  bottom: -14px;
+  background:
+    radial-gradient(circle at 10% 16%, rgba(255, 255, 255, 0.76), transparent 30%),
+    radial-gradient(circle at 84% 18%, rgba(246, 210, 224, 0.22), transparent 30%),
+    radial-gradient(circle at 76% 84%, rgba(189, 217, 254, 0.24), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 252, 255, 0.86));
+}
+
+.home-focus-copy h1 {
+  max-width: 10.2em;
+  font-size: clamp(44px, 5.8vw, 78px);
+  letter-spacing: -0.024em;
+}
+
+.home-focus-lead {
+  margin: 10px 0 4px;
+  color: #6c84ab;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-focus-subtitle {
+  margin: 14px 0 12px;
+  max-width: 33em;
+}
+
+.home-hero-main-cta {
+  min-width: 228px;
+  min-height: 50px;
+  font-size: 16px;
+  box-shadow: 0 16px 34px rgba(109, 147, 197, 0.36);
+}
+
+.home-hero-sub-cta {
+  min-width: 142px;
+}
+
+.home-hero-context {
+  margin-top: 12px;
+  color: #5e789f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.home-focus-art {
+  padding: 20px 20px 18px;
+  border-radius: 26px;
+}
+
+.home-hero-role-card {
+  margin-top: 12px;
+}
+
+.home-hero-mini-actions {
+  margin-top: 10px;
+}
+
+.home-hero-mini-actions .ghost-btn {
+  min-width: 132px;
+}
+
+@media (max-width: 980px) {
+  .home-focus-hero {
+    padding: 8px 0 4px;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .home-focus-copy h1 {
+    font-size: clamp(36px, 9.4vw, 50px);
+  }
+
+  .home-focus-lead {
+    margin-top: 8px;
+    font-size: 12px;
+  }
+
+  .home-hero-context {
+    font-size: 12px;
+  }
+
+  .home-hero-mini-actions .ghost-btn {
+    width: 100%;
+  }
+}
