@@ -3,8 +3,8 @@
     "version":  2,
     "framework":  "vite",
     "installCommand":  "pnpm install --frozen-lockfile",
-    "buildCommand":  "pnpm run build",
-    "outputDirectory":  "dist",
+    "buildCommand":  "pnpm run build:site",
+    "outputDirectory":  "apps/site/dist",
     "headers":  [
                     {
                         "source":  "/download/app.apk",
