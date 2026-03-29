@@ -116,10 +116,21 @@ export function HomePage({ WheelSection }: Props) {
       </section>
 
       <section className="section brand-panel tone-cream home-section-future">
-        <h2>小羊卷，正在慢慢走进你的生活。</h2>
-        <p>
-          从网页和 App 开始，羊卷岛也会逐步带来更多围绕小羊卷的日常陪伴：玩偶、挂饰、盲盒、幸运色系列周边，以及更多可以被拥有、被放在身边的小小陪伴。
+        <h2>小羊卷的陪伴，会慢慢长出更多形态。</h2>
+        <p className="home-future-intro">
+          羊卷岛的成长不会跳到重商城，而是沿着现在的体验自然延伸：从网页和 App 的每日幸运色，
+          到更多可以被放在身边的轻陪伴内容。
         </p>
+        <p className="home-future-note">
+          当前阶段：以内容预告与品牌表达为主，不做售卖区。
+        </p>
+        <div className="home-future-bridge">
+          <span>小羊卷角色</span>
+          <i>→</i>
+          <span>日常陪伴体验</span>
+          <i>→</i>
+          <span>未来周边形态</span>
+        </div>
         <div className="grid">
           {FUTURE_LABS.slice(0, 3).map((item) => (
             <article key={item.title}>
@@ -140,6 +151,7 @@ export function HomePage({ WheelSection }: Props) {
           <a className="ghost-btn" href="/future">查看更多未来计划</a>
           <a className="ghost-btn" href="/companion-plush">查看陪伴玩偶系列</a>
         </div>
+        <p className="home-next-step">这些预告会跟随品牌节奏逐步展开，而不是一次性堆满。</p>
       </section>
 
       <section className="section brand-panel tone-mist brand-closing home-section-closing">

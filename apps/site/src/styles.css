@@ -4988,3 +4988,69 @@ body {
     width: 100%;
   }
 }
+
+/* ===== Home Future Growth Refinement ===== */
+.home-section-future .home-future-intro {
+  margin-bottom: 6px;
+}
+
+.home-section-future .home-future-note {
+  margin: 0;
+  color: #6a82a6;
+  font-size: 13px;
+}
+
+.home-future-bridge {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  border: 1px solid #d9e4f5;
+  border-radius: 999px;
+  background: #fff;
+  padding: 7px 12px;
+}
+
+.home-future-bridge span {
+  color: #536f98;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-future-bridge i {
+  color: #89a4ca;
+  font-style: normal;
+  font-size: 12px;
+}
+
+.home-section-future .grid article {
+  border-style: solid;
+  border-color: #dce7f6;
+  box-shadow: 0 6px 16px rgba(75, 101, 145, 0.08);
+}
+
+.home-section-future .grid article h3 {
+  color: #3c5b8a;
+}
+
+.home-section-future .grid article p {
+  color: #5d769a;
+}
+
+.home-section-future .plush-mini-item {
+  border-color: #dbe7f6;
+  background: linear-gradient(180deg, #fff, #fcfdff);
+}
+
+@media (max-width: 760px) {
+  .home-future-bridge {
+    border-radius: 12px;
+  }
+
+  .home-future-bridge span,
+  .home-future-bridge i {
+    font-size: 11px;
+  }
+}
