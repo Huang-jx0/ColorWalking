@@ -4786,3 +4786,68 @@ body {
     width: 100%;
   }
 }
+
+/* ===== Home Hero IP Presence Boost ===== */
+.home-hero-ip-reason {
+  margin: 8px 0 0;
+  color: #395b89;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.home-hero-context {
+  margin-top: 12px;
+  color: #4f6e99;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.home-hero-entry-hint {
+  margin: 4px 0 0;
+  color: #6a82a7;
+  font-size: 12px;
+}
+
+.home-hero-ip-badge {
+  margin: 0 0 10px;
+  display: inline-block;
+  border: 1px solid #d7e4f6;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #f6faff);
+  color: #3f608e;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 10px;
+}
+
+.home-focus-art .hero-art-note {
+  margin-top: 10px;
+  color: #4f6f99;
+  font-weight: 600;
+}
+
+.home-hero-role-card {
+  border-color: #cfdef4;
+  background: linear-gradient(180deg, #ffffff, #f9fcff);
+}
+
+.home-hero-mini-actions .ghost-btn {
+  border-color: #cfe0f6;
+  background: #fff;
+}
+
+.home-hero-mini-actions .ghost-btn:hover {
+  border-color: #b9d0ef;
+  background: #f8fbff;
+}
+
+@media (max-width: 760px) {
+  .home-hero-ip-reason {
+    font-size: 13px;
+  }
+
+  .home-hero-entry-hint {
+    font-size: 12px;
+  }
+}

@@ -14,6 +14,7 @@ export function HomePage({ WheelSection }: Props) {
           <p className="home-focus-kicker">LambRoll Isle · 羊卷岛  让陪伴有颜色</p>
           <h1>今天，也为自己抽一份幸运颜色。</h1>
           <p className="home-focus-lead">Lucky Color · Daily Companion</p>
+          <p className="home-hero-ip-reason">小羊卷是把“今天的幸运颜色”送到你身边的核心角色。</p>
           <p className="home-focus-subtitle">
             在黑白灰的日常里，让小羊卷为你送来一点颜色、一点期待，和一点温柔陪伴。
           </p>
@@ -22,10 +23,12 @@ export function HomePage({ WheelSection }: Props) {
             <a className="cta home-hero-main-cta" href="/lucky-color">抽取今日幸运色</a>
             <a className="ghost-btn home-hero-sub-cta" href="/xiaoyangjuan">认识小羊卷</a>
           </div>
-          <p className="home-hero-context">今日入口：Lucky Color · 核心 IP：小羊卷</p>
+          <p className="home-hero-context">今天这一抽，由小羊卷为你送达。</p>
+          <p className="home-hero-entry-hint">先抽取今日幸运色，再认识小羊卷是谁。</p>
         </div>
 
         <aside className="home-focus-art sheep-card">
+          <p className="home-hero-ip-badge">核心 IP · 小羊卷</p>
           <img src="/brand-logo.svg" alt="羊卷岛与小羊卷品牌视觉" loading="eager" decoding="async" />
           <p className="hero-art-note">小羊卷会把属于今天的幸运颜色，轻轻送到你身边。</p>
           <div className="home-hero-role-card">
