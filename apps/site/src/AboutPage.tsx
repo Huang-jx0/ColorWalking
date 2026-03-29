@@ -1,6 +1,21 @@
 ﻿import { useMemo, useState } from "react";
 import { FAQ_ITEMS, SUPPORT_CHANNELS } from "./config/brandWorld";
 
+const BRAND_LOGIC = [
+  {
+    title: "品牌层",
+    desc: "LambRoll Isle 负责品牌语气、视觉系统与长期陪伴主张。"
+  },
+  {
+    title: "IP层",
+    desc: "小羊卷负责角色人格、情绪语气和世界观连接。"
+  },
+  {
+    title: "产品层",
+    desc: "今日幸运色、桌宠与 App 负责把陪伴落到可体验的日常动作。"
+  }
+] as const;
+
 export function AboutPage() {
   const [query, setQuery] = useState("");
 
@@ -29,8 +44,15 @@ export function AboutPage() {
       </section>
 
       <section className="section brand-panel tone-cloud">
-        <h2>品牌与小羊卷的关系</h2>
-        <p>小羊卷不是装饰，而是品牌核心 IP。羊卷岛通过它连接每日幸运色、桌宠体验、App 与未来周边。</p>
+        <h2>品牌结构</h2>
+        <div className="brand-pillars">
+          {BRAND_LOGIC.map((item) => (
+            <article key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="section brand-panel tone-cream">

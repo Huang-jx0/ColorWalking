@@ -7,33 +7,26 @@ type Props = {
   WheelSection: ReactNode;
 };
 
-const BRAND_PILLARS = [
+const HERO_SIGNATURES = ["幸运色", "小羊卷", "颜色云岛", "轻仪式感"] as const;
+
+const BRAND_PROMISE = [
   {
-    title: "品牌站",
-    desc: "让用户一眼理解 LambRoll Isle 是什么，并感受到“让陪伴有颜色”的品牌气质。"
+    title: "每天一份幸运颜色",
+    desc: "不是压力任务，而是温柔提醒。"
   },
   {
-    title: "产品入口",
-    desc: "今日幸运色是核心体验：每天一抽，得到可执行、可感知的轻仪式感提醒。"
+    title: "小羊卷在场陪伴",
+    desc: "不吵闹、不打断，但一直在。"
   },
   {
-    title: "IP 承载",
-    desc: "小羊卷是核心角色，不是装饰图。官网要持续承载它的设定、语气与成长线。"
+    title: "从官网到 App 一致",
+    desc: "同一语气、同一体验节奏。"
   }
 ] as const;
 
-const HOME_FLOW = [
-  "先看见品牌与小羊卷",
-  "再进入今日幸运色体验",
-  "随后了解世界观与 App",
-  "最后看到未来成长预告"
-] as const;
-
-const HERO_SIGNATURES = ["幸运色", "小羊卷", "颜色云岛", "轻仪式感"] as const;
-
 export function HomePage({ WheelSection }: Props) {
   return (
-    <div className="brand-shell">
+    <div className="brand-shell home-v6">
       <header className="brand-hero">
         <div className="brand-hero-copy">
           <p className="brand-kicker">{BRAND_COPY.heroTag}</p>
@@ -50,64 +43,43 @@ export function HomePage({ WheelSection }: Props) {
             <a className="ghost-btn" href="/xiaoyangjuan">认识小羊卷</a>
           </div>
         </div>
+
         <div className="brand-hero-art sheep-card">
           <img src="/brand-logo.svg" alt="LambRoll Isle 羊卷岛品牌视觉" loading="eager" decoding="async" />
           <p className="hero-art-note">{BRAND_COPY.heroNote}</p>
+          <div className="hero-art-sign">
+            {BRAND_PROMISE.map((item) => (
+              <article key={item.title}>
+                <b>{item.title}</b>
+                <p>{item.desc}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </header>
 
-      <section className="section brand-panel tone-mist brand-anchor">
-        <article>
-          <h2>把颜色变成陪伴</h2>
-          <p>
-            羊卷岛希望把“颜色”从视觉偏好变成日常陪伴语言，用更轻柔、可执行的方式，承接情绪与生活节奏。
-          </p>
-        </article>
-        <article>
-          <h3>产品口号</h3>
-          <p>{BRAND_COPY.productSlogan}</p>
-          <div className="start-actions">
-            <a className="ghost-btn" href="/brand-manual">查看品牌手册页</a>
-          </div>
-        </article>
-      </section>
-
-      <section className="section brand-panel tone-cloud">
+      <section className="section brand-panel tone-mist">
         <h2>这里是羊卷岛</h2>
         <p>{BRAND_COPY.oneLiner}</p>
-        <div className="brand-pillars">
-          {BRAND_PILLARS.map((item) => (
-            <article key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.desc}</p>
-            </article>
-          ))}
-        </div>
+        <p>
+          在这里，你会先看到今天的幸运色入口，再认识小羊卷和它所在的颜色云岛，
+          最后看到这个品牌如何一步步长成更完整的陪伴世界。
+        </p>
       </section>
 
-      <section className="section brand-panel tone-cream">
-        <h2>品牌体验路径</h2>
-        <div className="brand-flow">
-          {HOME_FLOW.map((item, idx) => (
-            <article key={item}>
-              <b>0{idx + 1}</b>
-              <p>{item}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section brand-panel tone-mist" id="home-lucky-entry">
+      <section className="section brand-panel tone-cloud" id="home-lucky-entry">
         <h2>今日幸运色主入口</h2>
-        <p>每天一份幸运颜色。先抽色，再把这份轻提醒带进今天的节奏里。</p>
+        <p>{BRAND_COPY.productSlogan}</p>
         <div className="start-actions">
           <a className="cta" href="/lucky-color">开始抽取</a>
           <a className="ghost-btn" href="#play">进入网页转盘</a>
         </div>
       </section>
 
-      <section className="section brand-panel tone-cloud">
-        <h2>小羊卷：核心 IP</h2>
+      {WheelSection}
+
+      <section className="section brand-panel tone-cream">
+        <h2>小羊卷：品牌核心 IP</h2>
         <p>{IP_WORLD.intro}</p>
         <div className="cw-chip-row" style={{ marginTop: 10 }}>
           {IP_WORLD.personality.map((item) => (
@@ -119,7 +91,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel tone-cream">
+      <section className="section brand-panel tone-cloud">
         <h2>颜色云岛</h2>
         <p>幸运色不是装饰，而是帮助你和当下情绪对齐的温柔信号。</p>
         <ul className="cw-list">
@@ -138,7 +110,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel tone-cloud">
+      <section className="section brand-panel tone-cream">
         <h2>未来周边与成长预告</h2>
         <p>先做轻量承载，不做重商城。让用户看到羊卷岛正在稳定成长。</p>
         <div className="grid">
@@ -154,7 +126,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel tone-cream">
+      <section className="section brand-panel tone-cloud">
         <h2>小羊卷陪伴玩偶系列</h2>
         <p>把小羊卷，轻轻放进日常里。</p>
         <div className="plush-mini-grid">
@@ -175,13 +147,12 @@ export function HomePage({ WheelSection }: Props) {
         <p>LambRoll Isle（羊卷岛）希望把颜色变成陪伴，把陪伴带进日常。</p>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cream">
         <h2>小羊卷桌宠体验</h2>
         <p>网页端已开放桌宠互动，和小羊卷打招呼、互动、散步，让陪伴更具体。</p>
       </section>
 
       <SheepPetGarden />
-      {WheelSection}
     </div>
   );
 }

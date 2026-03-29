@@ -3992,3 +3992,155 @@ body {
     width: auto;
   }
 }
+
+/* ===== Brand Rework V6 (Aesthetic Audit Pass) ===== */
+.brand-v6 .section {
+  margin-top: 52px;
+}
+
+.brand-v6 .brand-hero {
+  margin-top: 14px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 32px;
+}
+
+.brand-v6 .brand-hero h1 {
+  max-width: 12.5em;
+}
+
+.brand-v6 .brand-subtitle {
+  max-width: 40em;
+}
+
+.brand-v6 .hero-signatures {
+  margin-top: 2px;
+  margin-bottom: 14px;
+}
+
+.brand-v6 .hero-signatures span {
+  background: linear-gradient(180deg, #ffffff, #f4f8ff);
+  border-color: #cfdef6;
+  color: #45648f;
+}
+
+.brand-v6 .hero-art-sign {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.brand-v6 .hero-art-sign article {
+  border: 1px solid #dce6f4;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.brand-v6 .hero-art-sign b {
+  color: #334f7d;
+  font-size: 13px;
+}
+
+.brand-v6 .hero-art-sign p {
+  margin: 4px 0 0;
+  color: #5e7395;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.brand-v6 .brand-panel {
+  padding: 28px;
+  border-radius: 24px;
+}
+
+.brand-v6 .brand-panel h2 {
+  font-size: clamp(25px, 2.8vw, 36px);
+  margin-bottom: 14px;
+}
+
+.brand-v6 .home-v6 .brand-panel p {
+  max-width: 52em;
+}
+
+.brand-v6 .play-shell {
+  margin-top: 18px;
+}
+
+.brand-v6 .download-assurance {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.brand-v6 .download-assurance span {
+  border: 1px solid #d8e3f4;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #4d698f;
+  font-size: 12px;
+  padding: 5px 10px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.brand-v6 .cw-faq-item {
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+}
+
+.brand-v6 .cw-faq-item + .cw-faq-item {
+  margin-top: 10px;
+}
+
+.brand-v6 .cw-footer-grid {
+  grid-template-columns: 1.1fr 1fr 1fr;
+}
+
+.brand-v6 .cw-footer-grid > div {
+  min-height: 100%;
+  padding: 18px;
+}
+
+.brand-v6 .brand-closing p {
+  max-width: 40em;
+}
+
+.brand-v6 .brand-closing {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+@media (max-width: 980px) {
+  .brand-v6 .brand-hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .brand-v6 .brand-panel {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .brand-v6 .cw-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .brand-v6 .section {
+    margin-top: 34px;
+  }
+
+  .brand-v6 .brand-panel h2 {
+    font-size: clamp(23px, 7vw, 30px);
+  }
+
+  .brand-v6 .hero-art-sign article {
+    padding: 9px 10px;
+  }
+
+  .brand-v6 .download-assurance span {
+    width: 100%;
+    border-radius: 10px;
+  }
+}

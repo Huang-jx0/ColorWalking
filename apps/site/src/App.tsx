@@ -66,7 +66,7 @@ export function App() {
   };
 
   return (
-    <div className="page">
+    <div className="page brand-v6">
       <nav className="top-nav cw-top-nav">
         <a className="nav-brand" href={ROUTE_PATHS.home}>
           <span>{BRAND_COPY.brandName}</span>
