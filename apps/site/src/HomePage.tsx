@@ -6,33 +6,34 @@ type Props = {
   WheelSection: ReactNode;
 };
 
-const HOME_HERO_TAGS = ["幸运色", "小羊卷", "颜色云岛", "轻仪式感"] as const;
-
 export function HomePage({ WheelSection }: Props) {
   return (
     <div className="brand-shell home-focus-page">
       <header className="home-focus-hero">
         <div className="home-focus-copy">
-          <p className="home-focus-kicker">羊卷岛  让陪伴有颜色</p>
+          <p className="home-focus-kicker">LambRoll Isle · 羊卷岛  让陪伴有颜色</p>
           <h1>今天，也为自己抽一份幸运颜色。</h1>
           <p className="home-focus-subtitle">
             在黑白灰的日常里，让小羊卷为你送来一点颜色、一点期待，和一点温柔陪伴。
           </p>
-          <div className="home-focus-tags">
-            {HOME_HERO_TAGS.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
-          <div className="actions">
-            <a className="cta" href="/lucky-color">抽取今日幸运色</a>
-            <a className="ghost-btn" href="/xiaoyangjuan">认识小羊卷</a>
-          </div>
           <p className="home-focus-note">一个围绕原创 IP小羊卷展开的陪伴品牌</p>
+          <div className="home-hero-actions">
+            <a className="cta home-hero-main-cta" href="/lucky-color">抽取今日幸运色</a>
+            <a className="ghost-btn home-hero-sub-cta" href="/xiaoyangjuan">认识小羊卷</a>
+          </div>
+          <div className="home-hero-context">
+            <span>今日入口：Lucky Color</span>
+            <span>核心 IP：小羊卷</span>
+          </div>
         </div>
 
         <aside className="home-focus-art sheep-card">
           <img src="/brand-logo.svg" alt="羊卷岛与小羊卷品牌视觉" loading="eager" decoding="async" />
           <p className="hero-art-note">小羊卷会把属于今天的幸运颜色，轻轻送到你身边。</p>
+          <div className="home-hero-role-card">
+            <b>小羊卷在首屏</b>
+            <p>不是装饰元素，而是品牌主角之一，负责把“幸运色”变成可感知的陪伴体验。</p>
+          </div>
         </aside>
       </header>
 
