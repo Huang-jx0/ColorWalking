@@ -106,6 +106,7 @@ export function App() {
             <p className="footer-sub">{BRAND_COPY.brandNameCn}</p>
             <p>{BRAND_COPY.oneLiner}</p>
             <p>{BRAND_COPY.slogan}</p>
+            <p>{BRAND_COPY.productSlogan}</p>
           </div>
           <div>
             <p className="footer-title"><b>站点导航</b></p>

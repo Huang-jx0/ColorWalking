@@ -3779,6 +3779,54 @@ body {
   margin-top: 2px;
 }
 
+.hero-signatures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.hero-signatures span {
+  border: 1px solid #d7e4f8;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #486994;
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.brand-anchor {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 14px;
+}
+
+.brand-anchor article {
+  border: 1px solid #dbe6f5;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.brand-anchor h2 {
+  margin-bottom: 8px;
+}
+
+.brand-anchor h3 {
+  margin: 0 0 8px;
+  color: #355688;
+  font-size: 16px;
+}
+
+.brand-anchor p {
+  margin: 0;
+}
+
+.brand-closing h2 {
+  font-size: clamp(30px, 3.6vw, 42px);
+  letter-spacing: -0.02em;
+}
+
 .cw-footer {
   padding-bottom: 4px;
 }
@@ -3802,6 +3850,10 @@ body {
 }
 
 @media (max-width: 760px) {
+  .brand-anchor {
+    grid-template-columns: 1fr;
+  }
+
   .footer-meta {
     flex-direction: column;
     align-items: flex-start;

@@ -29,6 +29,8 @@ const HOME_FLOW = [
   "最后看到未来成长预告"
 ] as const;
 
+const HERO_SIGNATURES = ["幸运色", "小羊卷", "颜色云岛", "轻仪式感"] as const;
+
 export function HomePage({ WheelSection }: Props) {
   return (
     <div className="brand-shell">
@@ -37,6 +39,11 @@ export function HomePage({ WheelSection }: Props) {
           <p className="brand-kicker">{BRAND_COPY.heroTag}</p>
           <h1>{BRAND_COPY.heroTitle}</h1>
           <p className="brand-subtitle">{BRAND_COPY.heroDesc}</p>
+          <div className="hero-signatures">
+            {HERO_SIGNATURES.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
           <p className="brand-note">{BRAND_COPY.slogan}</p>
           <div className="actions">
             <a className="cta" href="/lucky-color">抽取今日幸运色</a>
@@ -48,6 +55,22 @@ export function HomePage({ WheelSection }: Props) {
           <p className="hero-art-note">{BRAND_COPY.heroNote}</p>
         </div>
       </header>
+
+      <section className="section brand-panel tone-mist brand-anchor">
+        <article>
+          <h2>把颜色变成陪伴</h2>
+          <p>
+            羊卷岛希望把“颜色”从视觉偏好变成日常陪伴语言，用更轻柔、可执行的方式，承接情绪与生活节奏。
+          </p>
+        </article>
+        <article>
+          <h3>产品口号</h3>
+          <p>{BRAND_COPY.productSlogan}</p>
+          <div className="start-actions">
+            <a className="ghost-btn" href="/brand-manual">查看品牌手册页</a>
+          </div>
+        </article>
+      </section>
 
       <section className="section brand-panel tone-cloud">
         <h2>这里是羊卷岛</h2>
@@ -63,7 +86,7 @@ export function HomePage({ WheelSection }: Props) {
       </section>
 
       <section className="section brand-panel tone-cream">
-        <h2>首页体验节奏</h2>
+        <h2>品牌体验路径</h2>
         <div className="brand-flow">
           {HOME_FLOW.map((item, idx) => (
             <article key={item}>
