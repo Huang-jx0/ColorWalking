@@ -1,22 +1,25 @@
 ﻿import React, { useMemo, useState } from "react";
 import { Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { CHIBI_THEME } from "../../packages/chibi-ui/src";
+import { FeaturesScreen } from "./src/screens/FeaturesScreen";
 import { LuckyWheelScreen } from "./src/screens/LuckyWheelScreen";
 import { OracleScreen } from "./src/screens/OracleScreen";
 import { PetScreen } from "./src/screens/PetScreen";
 
-type TabKey = "wheel" | "oracle" | "pet";
+type TabKey = "features" | "wheel" | "oracle" | "pet";
 
 const TABS: Array<{ key: TabKey; label: string }> = [
-  { key: "wheel", label: "转盘" },
+  { key: "features", label: "产品亮点" },
+  { key: "wheel", label: "幸运转盘" },
   { key: "oracle", label: "时色签" },
-  { key: "pet", label: "小羊卷养成" }
+  { key: "pet", label: "小羊卷" }
 ] as const;
 
 export default function App() {
-  const [tab, setTab] = useState<TabKey>("wheel");
+  const [tab, setTab] = useState<TabKey>("features");
 
   const subtitle = useMemo(() => {
+    if (tab === "features") return "产品亮点与每日小习惯";
     if (tab === "wheel") return "抽取你的今日幸运色";
     if (tab === "oracle") return "今天的时色签和小提醒";
     return "小羊卷养成仓";
@@ -30,6 +33,7 @@ export default function App() {
         <Text style={styles.subtitle}>{subtitle}</Text>
 
         <View style={styles.content}>
+          {tab === "features" ? <FeaturesScreen onNavigate={setTab} /> : null}
           {tab === "wheel" ? <LuckyWheelScreen /> : null}
           {tab === "oracle" ? <OracleScreen /> : null}
           {tab === "pet" ? <PetScreen /> : null}
@@ -95,7 +99,8 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: CHIBI_THEME.color.textNormal,
-    fontWeight: "700"
+    fontWeight: "700",
+    fontSize: 12
   },
   tabTextActive: {
     color: "#FFFFFF"
