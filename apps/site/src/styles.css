@@ -3859,3 +3859,136 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ===== Brand Rework V5 (Final Polish) ===== */
+.top-nav {
+  border: 1px solid rgba(208, 224, 246, 0.92);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(252, 254, 255, 0.92));
+  box-shadow: 0 10px 24px rgba(64, 93, 145, 0.1);
+}
+
+.nav-brand {
+  min-width: 180px;
+}
+
+.nav-brand small {
+  line-height: 1.4;
+}
+
+.nav-links a {
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #8bb3df, #f1b8c9);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.nav-active::after {
+  transform: scaleX(1);
+}
+
+.cta,
+.ghost-btn {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta {
+  background: linear-gradient(180deg, #8fb7e2, #7fa8d8);
+}
+
+.brand-panel {
+  border: 1px solid rgba(212, 226, 245, 0.9);
+}
+
+.brand-panel,
+.cw-footer-grid > div,
+.brand-pillars article,
+.brand-flow article,
+.ip-scenes article,
+.plush-mini-item,
+.cw-ip-gallery article,
+.cw-roadmap article {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.brand-panel:hover,
+.cw-footer-grid > div:hover {
+  border-color: #c8d9f1;
+  box-shadow: 0 14px 30px rgba(70, 97, 146, 0.12);
+}
+
+.brand-pillars article:hover,
+.brand-flow article:hover,
+.ip-scenes article:hover,
+.plush-mini-item:hover,
+.cw-ip-gallery article:hover,
+.cw-roadmap article:hover {
+  transform: translateY(-2px);
+  border-color: #cadef7;
+  box-shadow: 0 8px 18px rgba(70, 97, 146, 0.1);
+}
+
+.brand-panel h2 {
+  letter-spacing: -0.015em;
+}
+
+.footer-meta {
+  padding-top: 8px;
+  border-top: 1px dashed #d8e5f8;
+}
+
+@media (max-width: 960px) {
+  .top-nav {
+    gap: 10px;
+  }
+
+  .brand-panel:hover,
+  .cw-footer-grid > div:hover,
+  .brand-pillars article:hover,
+  .brand-flow article:hover,
+  .ip-scenes article:hover,
+  .plush-mini-item:hover,
+  .cw-ip-gallery article:hover,
+  .cw-roadmap article:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .top-nav {
+    border-radius: 14px;
+  }
+
+  .nav-brand {
+    min-width: 0;
+  }
+
+  .brand-panel {
+    border-radius: 18px;
+  }
+
+  .cta,
+  .ghost-btn {
+    width: 100%;
+  }
+
+  .actions .ghost-btn {
+    width: auto;
+  }
+}
