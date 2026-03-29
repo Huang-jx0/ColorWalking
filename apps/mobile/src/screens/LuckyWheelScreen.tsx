@@ -1,25 +1,10 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+﻿import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Animated,
-  Easing,
-  Image,
-  Pressable,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import { Animated, Easing, Image, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { buildLuckyShareText, MODE_RITUAL_LINE, RITUAL_LINES } from "@colorwalking/shared";
+import { CHIBI_CARD_STYLE, CHIBI_THEME } from "../../../../packages/chibi-ui/src";
 import { MobileSheepCompanion } from "../components/MobileSheepCompanion";
-import {
-  COLOR_PALETTE,
-  computeHistoryStats,
-  createDrawEngine,
-  formatDayKey,
-  type DrawResult
-} from "../lib/luckyEngine";
+import { COLOR_PALETTE, computeHistoryStats, createDrawEngine, formatDayKey, type DrawResult } from "../lib/luckyEngine";
 import { WheelGraphic } from "../components/WheelGraphic";
 
 const HISTORY_KEY = "colorwalking.history.v1";
@@ -144,12 +129,7 @@ export function LuckyWheelScreen() {
 
     const todayKey = formatDayKey(new Date());
     const ritual = await loadRitual();
-    const draw =
-      mode === "daily"
-        ? ritual?.dayKey === todayKey
-          ? ritual.result
-          : engine.drawDaily()
-        : engine.draw();
+    const draw = mode === "daily" ? (ritual?.dayKey === todayKey ? ritual.result : engine.drawDaily()) : engine.draw();
 
     if (mode === "daily" && (!ritual || ritual.dayKey !== todayKey)) {
       await AsyncStorage.setItem(RITUAL_KEY, JSON.stringify({ dayKey: todayKey, result: draw }));
@@ -158,7 +138,7 @@ export function LuckyWheelScreen() {
 
     setCompanionPhase("anticipate");
     setRitualState("spinning");
-    setRitualLine("小羊卷抱着幸运色礼盒，正在转转转。\n");
+    setRitualLine("小羊卷抱着幸运色礼盒，正在转呀转。\n");
 
     const sector = 360 / engine.palette.length;
     const targetCenter = draw.index * sector + sector / 2;
@@ -177,7 +157,7 @@ export function LuckyWheelScreen() {
 
       setRitualState("revealing");
       setCompanionPhase("revealing");
-      setRitualLine("叮！小羊卷把今天的颜色递给你啦。\n");
+      setRitualLine("叮，小羊卷把今天的颜色递给你啦。\n");
       setResult(draw);
 
       revealAnim.setValue(0);
@@ -328,7 +308,7 @@ export function LuckyWheelScreen() {
             <Text style={styles.message}>{result.color.message}</Text>
             <Text style={styles.subline}>小羊卷说：把这份颜色放进今天的口袋。</Text>
             <Pressable style={styles.shareBtn} onPress={onShare}>
-              <Text style={styles.shareText}>分享这份可爱好运</Text>
+              <Text style={styles.shareText}>分享这份好运</Text>
             </Pressable>
           </Animated.View>
         ) : (
@@ -366,16 +346,12 @@ const styles = StyleSheet.create({
   page: {
     paddingBottom: 28,
     paddingHorizontal: 12,
-    backgroundColor: "#F7F7FC"
+    backgroundColor: CHIBI_THEME.color.pageBg
   },
   heroCard: {
+    ...CHIBI_CARD_STYLE,
     marginTop: 8,
     marginBottom: 12,
-    borderRadius: 18,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E7ECFA",
-    padding: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 12
@@ -388,11 +364,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: "800",
-    color: "#213254"
+    color: CHIBI_THEME.color.textStrong
   },
   subtitle: {
     marginTop: 2,
-    color: "#6A7EA4",
+    color: CHIBI_THEME.color.textSoft,
     fontSize: 13
   },
   ritualLine: {
@@ -422,11 +398,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF"
   },
   modeBtnActive: {
-    backgroundColor: "#2F4B8A",
-    borderColor: "#2F4B8A"
+    backgroundColor: CHIBI_THEME.color.primary,
+    borderColor: CHIBI_THEME.color.primary
   },
   modeText: {
-    color: "#30405F",
+    color: CHIBI_THEME.color.textNormal,
     fontWeight: "700"
   },
   modeTextActive: {
@@ -514,10 +490,10 @@ const styles = StyleSheet.create({
     width: 108,
     height: 108,
     borderRadius: 54,
-    backgroundColor: "#4D80E8",
+    backgroundColor: CHIBI_THEME.color.primarySoft,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#4D80E8",
+    shadowColor: CHIBI_THEME.color.primarySoft,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16
@@ -531,26 +507,16 @@ const styles = StyleSheet.create({
     fontWeight: "800"
   },
   card: {
-    width: "100%",
-    borderRadius: 18,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E8ECF8",
-    padding: 16,
+    ...CHIBI_CARD_STYLE,
     marginBottom: 12
   },
   historyCard: {
-    width: "100%",
-    borderRadius: 18,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E8ECF8",
-    padding: 16
+    ...CHIBI_CARD_STYLE
   },
   cardTitle: {
     fontSize: 17,
     fontWeight: "800",
-    color: "#233457",
+    color: CHIBI_THEME.color.textStrong,
     marginBottom: 10
   },
   swatchWrap: {
@@ -590,17 +556,17 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 15,
-    color: "#33415F",
+    color: CHIBI_THEME.color.textNormal,
     marginTop: 2
   },
   subline: {
     marginTop: 8,
-    color: "#6E7FA1"
+    color: CHIBI_THEME.color.textSoft
   },
   shareBtn: {
     marginTop: 10,
     alignSelf: "flex-start",
-    backgroundColor: "#2D467D",
+    backgroundColor: CHIBI_THEME.color.primary,
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12
@@ -610,7 +576,7 @@ const styles = StyleSheet.create({
     fontWeight: "700"
   },
   statText: {
-    color: "#455573",
+    color: CHIBI_THEME.color.textNormal,
     marginBottom: 4
   },
   placeholder: {
