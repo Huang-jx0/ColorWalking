@@ -3,7 +3,7 @@ import { type ReactNode, useState } from "react";
 import { SheepPetGarden } from "./SheepPetGarden";
 import { LuckyColorOracle } from "./LuckyColorOracle";
 import { ANDROID_APK_URL, BRAND_COPY, DOWNLOAD_PAGE_PATH } from "./config/experience";
-import { FUTURE_LABS, SEASONAL_PREVIEWS } from "./config/brandWorld";
+import { FUTURE_LABS, SEASONAL_PREVIEWS, WEEKLY_THEME } from "./config/brandWorld";
 
 type Props = {
   WheelSection: ReactNode;
@@ -58,6 +58,16 @@ export function HomePage({ WheelSection }: Props) {
             <h3>下载与增长</h3>
             <p>统一品牌域名下载入口，承接移动端转化与后续回访。</p>
           </article>
+        </div>
+      </section>
+
+      <section className="section cw-card cw-weekly-card">
+        <h2>{WEEKLY_THEME.weekTitle}</h2>
+        <p>{WEEKLY_THEME.subtitle}</p>
+        <div className="cw-weekly-tasks">
+          {WEEKLY_THEME.tasks.map((task) => (
+            <span key={task}>{task}</span>
+          ))}
         </div>
       </section>
 

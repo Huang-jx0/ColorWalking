@@ -3020,3 +3020,66 @@ select:focus-visible {
     grid-column: 2;
   }
 }
+.cw-weekly-card p {
+  color: #536b90;
+  margin: 0;
+}
+
+.cw-weekly-tasks {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cw-weekly-tasks span {
+  border: 1px solid #d7e4f8;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #385a8f;
+  font-size: 13px;
+  padding: 4px 10px;
+}
+
+.cw-export-btn {
+  border: 1px solid #d0def5;
+  border-radius: 10px;
+  background: #fff;
+  color: #3d5d8e;
+  padding: 9px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cw-export-btn:hover {
+  border-color: #b8cef0;
+}
+
+.cw-troubleshoot-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #4c6388;
+  line-height: 1.75;
+}
+
+.cw-troubleshoot-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cw-troubleshoot-actions button {
+  border: 1px solid #d2e0f6;
+  border-radius: 10px;
+  background: #fff;
+  color: #375a8f;
+  padding: 8px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cw-troubleshoot-hint {
+  margin-top: 8px;
+  color: #4d72a6;
+}

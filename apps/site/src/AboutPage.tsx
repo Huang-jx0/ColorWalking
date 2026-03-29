@@ -1,14 +1,26 @@
 ﻿import { useMemo, useState } from "react";
-import { FAQ_ITEMS, SUPPORT_CHANNELS } from "./config/brandWorld";
+import { FAQ_ITEMS, INSTALL_TROUBLESHOOT, SUPPORT_CHANNELS } from "./config/brandWorld";
 
 export function AboutPage() {
   const [query, setQuery] = useState("");
+  const [copied, setCopied] = useState("");
 
   const filteredFaq = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return FAQ_ITEMS;
     return FAQ_ITEMS.filter((item) => (`${item.q} ${item.a}`).toLowerCase().includes(q));
   }, [query]);
+
+  const onCopyPath = async (path: string) => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${path}`);
+      setCopied(`${path} 已复制`);
+      window.setTimeout(() => setCopied(""), 1200);
+    } catch {
+      setCopied("复制失败，请手动复制链接");
+      window.setTimeout(() => setCopied(""), 1200);
+    }
+  };
 
   return (
     <div className="cw-page-stack">
@@ -28,6 +40,20 @@ export function AboutPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="section cw-card">
+        <h2>安装排障（一步步）</h2>
+        <ol className="cw-troubleshoot-list">
+          {INSTALL_TROUBLESHOOT.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+        <div className="cw-troubleshoot-actions">
+          <button type="button" onClick={() => onCopyPath("/download/app.apk")}>复制主下载链接</button>
+          <button type="button" onClick={() => onCopyPath("/downloads/colorwalking-latest.apk")}>复制镜像链接</button>
+        </div>
+        {copied ? <p className="cw-troubleshoot-hint">{copied}</p> : null}
       </section>
 
       <section className="section cw-card">

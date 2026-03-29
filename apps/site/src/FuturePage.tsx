@@ -3,21 +3,32 @@ import { FUTURE_LABS, FUTURE_ROADMAP } from "./config/brandWorld";
 
 const WAITLIST_KEY = "colorwalking.future.waitlist.v1";
 
-function readWaitlistCount(): number {
+type WaitEntry = { email: string; at: string };
+
+function readWaitlist(): WaitEntry[] {
   try {
     const raw = localStorage.getItem(WAITLIST_KEY);
-    if (!raw) return 0;
-    const list = JSON.parse(raw) as Array<{ email: string; at: string }>;
-    return list.length;
+    if (!raw) return [];
+    return JSON.parse(raw) as WaitEntry[];
   } catch {
-    return 0;
+    return [];
   }
+}
+
+function downloadCsv(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export function FuturePage() {
   const [email, setEmail] = useState("");
   const [saved, setSaved] = useState("");
-  const [count, setCount] = useState(() => readWaitlistCount());
+  const [count, setCount] = useState(() => readWaitlist().length);
   const quarter = useMemo(() => Math.floor((new Date().getMonth() + 3) / 3), []);
 
   const onJoin = (e: FormEvent) => {
@@ -28,8 +39,7 @@ export function FuturePage() {
       return;
     }
     try {
-      const raw = localStorage.getItem(WAITLIST_KEY);
-      const list = raw ? (JSON.parse(raw) as Array<{ email: string; at: string }>) : [];
+      const list = readWaitlist();
       if (!list.find((x) => x.email === mail)) {
         list.unshift({ email: mail, at: new Date().toISOString() });
         localStorage.setItem(WAITLIST_KEY, JSON.stringify(list.slice(0, 500)));
@@ -40,6 +50,17 @@ export function FuturePage() {
     } catch {
       setSaved("保存失败，请稍后重试。");
     }
+  };
+
+  const onExport = () => {
+    const list = readWaitlist();
+    if (!list.length) {
+      setSaved("当前没有可导出的订阅记录。");
+      return;
+    }
+    const rows = ["email,created_at", ...list.map((x) => `${x.email},${x.at}`)].join("\n");
+    downloadCsv("colorwalking-future-waitlist.csv", rows);
+    setSaved("已导出订阅名单 CSV。");
   };
 
   return (
@@ -79,6 +100,7 @@ export function FuturePage() {
         <form className="cw-waitlist-form" onSubmit={onJoin}>
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="输入邮箱，例如 you@example.com" />
           <button type="submit">加入提醒</button>
+          <button type="button" className="cw-export-btn" onClick={onExport}>导出CSV</button>
         </form>
         {saved ? <p className="cw-waitlist-msg">{saved}</p> : null}
       </section>

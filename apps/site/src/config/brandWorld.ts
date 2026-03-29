@@ -49,6 +49,12 @@ export const SHEEP_QUOTES = [
   "你可以不完美，但可以被温柔对待。"
 ] as const;
 
+export const WEEKLY_THEME = {
+  weekTitle: "本周主题：轻呼吸计划",
+  subtitle: "把节奏放慢一点，每天保留 10 秒给自己。",
+  tasks: ["抽取今日幸运色", "记录一句时色签", "和小羊卷完成一次互动"]
+} as const;
+
 export const FUTURE_LABS = [
   { title: "小羊卷玩偶", desc: "软绒材质 + 可替换围巾，绑定你的常用幸运色。" },
   { title: "幸运色围巾系列", desc: "按季度推出色卡与围巾联名套组，支持收藏编号。" },
@@ -99,6 +105,13 @@ export const SUPPORT_CHANNELS = [
     contact: "GitHub Issues",
     desc: "功能建议、体验反馈与缺陷报告。"
   }
+] as const;
+
+export const INSTALL_TROUBLESHOOT = [
+  "确认下载链接为 /download/app.apk 或 /downloads/colorwalking-latest.apk。",
+  "若手机提示文件不是安装包，请清理浏览器下载缓存后重试。",
+  "若安装被拦截，请开启“允许安装未知来源应用”。",
+  "若仍是旧版本，请先卸载旧版 ColorWalking 再安装新包。"
 ] as const;
 
 export const FAQ_ITEMS = [
