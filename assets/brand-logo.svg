@@ -1,20 +1,20 @@
-﻿<svg width="1024" height="512" viewBox="0 0 1024 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LambRoll Isle 羊卷岛品牌标识图">
+﻿<svg width="1024" height="512" viewBox="0 0 1024 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LambRoll Isle 羊卷岛 字标主导型品牌图">
   <rect width="1024" height="512" rx="36" fill="#E6EDF7"/>
 
-  <g transform="translate(104,170)">
-    <rect width="176" height="176" rx="28" fill="#F3F7FF" stroke="#D0DCEC" stroke-width="3"/>
+  <g transform="translate(92,118)">
+    <rect width="286" height="286" rx="40" fill="#F3F7FF" stroke="#D1DCEC" stroke-width="3"/>
 
-    <circle cx="88" cy="88" r="48" fill="none" stroke="#2E466F" stroke-width="10"/>
-    <path d="M66 88 C66 72, 80 62, 94 62 C108 62, 120 72, 120 86 C120 100, 108 112, 94 112 C86 112, 82 116, 84 124" fill="none" stroke="#2E466F" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="143" cy="152" r="68" fill="none" stroke="#2E466F" stroke-width="10"/>
+    <path d="M116 146 C116 128, 129 116, 146 116 C165 116, 178 130, 178 148 C178 166, 164 180, 145 180 C136 180, 130 184, 132 194" fill="none" stroke="#2E466F" stroke-width="8" stroke-linecap="round"/>
 
-    <path d="M58 46 C68 32, 84 28, 98 34" fill="none" stroke="#8EAED5" stroke-width="8" stroke-linecap="round"/>
-    <path d="M116 44 C126 30, 142 28, 154 36" fill="none" stroke="#8EAED5" stroke-width="8" stroke-linecap="round"/>
+    <path d="M102 96 C115 80, 137 77, 155 88" fill="none" stroke="#90AFD6" stroke-width="8" stroke-linecap="round"/>
+    <path d="M162 95 C175 80, 196 78, 211 90" fill="none" stroke="#90AFD6" stroke-width="8" stroke-linecap="round"/>
 
-    <path d="M50 122 H126 L112 146 H66 Z" fill="#86AEDB"/>
+    <path d="M84 206 H190 L172 234 H102 Z" fill="#86AEDB"/>
   </g>
 
-  <g transform="translate(336,214)">
-    <text x="0" y="0" font-size="92" font-weight="760" letter-spacing="0.4" font-family="Avenir Next, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" fill="#243A60">LambRoll Isle</text>
-    <text x="2" y="72" font-size="40" font-weight="650" letter-spacing="2" font-family="Avenir Next, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" fill="#4A678F">羊卷岛</text>
+  <g transform="translate(418,206)">
+    <text x="0" y="0" font-size="96" font-weight="760" letter-spacing="0.3" font-family="Avenir Next, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" fill="#243A60">LambRoll Isle</text>
+    <text x="3" y="74" font-size="42" font-weight="650" letter-spacing="2" font-family="Avenir Next, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" fill="#4A678F">羊卷岛</text>
   </g>
 </svg>
