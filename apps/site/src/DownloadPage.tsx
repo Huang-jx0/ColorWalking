@@ -21,7 +21,7 @@ export function DownloadPage() {
 
   return (
     <div className="brand-shell download-page">
-      <header className="section brand-panel download-hero-v2 page-head">
+      <header className="section brand-panel download-hero-v2 page-head tone-mist">
         <div className="download-copy">
           <p className="brand-kicker">LambRoll Isle · Download</p>
           <h1>下载 App</h1>
@@ -44,7 +44,7 @@ export function DownloadPage() {
         </div>
       </header>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cloud">
         <h2>安装说明（基础版）</h2>
         <div className="grid">
           <article>
@@ -63,7 +63,7 @@ export function DownloadPage() {
         <p className="apk-note">当前版本（占位）：{version} · 更新日期（占位）：{updatedAt}</p>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cream">
         <h2>常见问题（下载）</h2>
         <details className="cw-faq-item">
           <summary>下载后提示无法安装怎么办？</summary>

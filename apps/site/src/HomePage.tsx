@@ -49,7 +49,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </header>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cloud">
         <h2>这里是羊卷岛</h2>
         <p>{BRAND_COPY.oneLiner}</p>
         <div className="brand-pillars">
@@ -62,7 +62,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cream">
         <h2>首页体验节奏</h2>
         <div className="brand-flow">
           {HOME_FLOW.map((item, idx) => (
@@ -74,7 +74,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel" id="home-lucky-entry">
+      <section className="section brand-panel tone-mist" id="home-lucky-entry">
         <h2>今日幸运色主入口</h2>
         <p>每天一份幸运颜色。先抽色，再把这份轻提醒带进今天的节奏里。</p>
         <div className="start-actions">
@@ -83,7 +83,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cloud">
         <h2>小羊卷：核心 IP</h2>
         <p>{IP_WORLD.intro}</p>
         <div className="cw-chip-row" style={{ marginTop: 10 }}>
@@ -96,7 +96,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cream">
         <h2>颜色云岛</h2>
         <p>幸运色不是装饰，而是帮助你和当下情绪对齐的温柔信号。</p>
         <ul className="cw-list">
@@ -106,7 +106,7 @@ export function HomePage({ WheelSection }: Props) {
         </ul>
       </section>
 
-      <section className="section brand-panel" id="home-download-entry">
+      <section className="section brand-panel tone-mist" id="home-download-entry">
         <h2>下载 App</h2>
         <p>Android 版本已可用。网页与 App 保持同一套语气与体验节奏。</p>
         <div className="start-actions">
@@ -115,7 +115,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cloud">
         <h2>未来周边与成长预告</h2>
         <p>先做轻量承载，不做重商城。让用户看到羊卷岛正在稳定成长。</p>
         <div className="grid">
@@ -131,7 +131,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel">
+      <section className="section brand-panel tone-cream">
         <h2>小羊卷陪伴玩偶系列</h2>
         <p>把小羊卷，轻轻放进日常里。</p>
         <div className="plush-mini-grid">
@@ -147,7 +147,7 @@ export function HomePage({ WheelSection }: Props) {
         </div>
       </section>
 
-      <section className="section brand-panel brand-closing">
+      <section className="section brand-panel brand-closing tone-mist">
         <h2>{BRAND_COPY.slogan}</h2>
         <p>LambRoll Isle（羊卷岛）希望把颜色变成陪伴，把陪伴带进日常。</p>
       </section>

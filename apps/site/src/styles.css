@@ -3750,3 +3750,60 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Brand Rework V4 ===== */
+.brand-panel.tone-cloud {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(187, 222, 255, 0.2), transparent 34%),
+    linear-gradient(180deg, #ffffff, #f8fcff);
+}
+
+.brand-panel.tone-cream {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(249, 233, 201, 0.22), transparent 34%),
+    linear-gradient(180deg, #fffefb, #fcfbf7);
+}
+
+.brand-panel.tone-mist {
+  background:
+    radial-gradient(circle at 90% 12%, rgba(245, 185, 199, 0.15), transparent 32%),
+    radial-gradient(circle at 8% 90%, rgba(198, 220, 255, 0.2), transparent 32%),
+    linear-gradient(180deg, #ffffff, #f9fbff);
+}
+
+.brand-hero {
+  padding: 6px 0 4px;
+}
+
+.brand-hero-copy .actions {
+  margin-top: 2px;
+}
+
+.cw-footer {
+  padding-bottom: 4px;
+}
+
+.footer-title {
+  margin-bottom: 8px;
+}
+
+.footer-sub {
+  color: #6079a3;
+  font-size: 13px;
+}
+
+.footer-meta {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .footer-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

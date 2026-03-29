@@ -102,13 +102,13 @@ export function App() {
       <footer className="footer cw-footer">
         <div className="cw-footer-grid">
           <div>
-            <p><b>{BRAND_COPY.brandName}</b></p>
-            <p>{BRAND_COPY.brandNameCn}</p>
+            <p className="footer-title"><b>{BRAND_COPY.brandName}</b></p>
+            <p className="footer-sub">{BRAND_COPY.brandNameCn}</p>
             <p>{BRAND_COPY.oneLiner}</p>
             <p>{BRAND_COPY.slogan}</p>
           </div>
           <div>
-            <p><b>站点导航</b></p>
+            <p className="footer-title"><b>站点导航</b></p>
             <p>
               <a href={ROUTE_PATHS.home}>首页</a> · <a href={ROUTE_PATHS.lucky}>今日幸运色</a> · <a href={ROUTE_PATHS.ip}>小羊卷</a>
             </p>
@@ -123,14 +123,16 @@ export function App() {
             </p>
           </div>
           <div>
-            <p><b>支持与帮助</b></p>
+            <p className="footer-title"><b>支持与帮助</b></p>
             <p>下载与安装：<a href={ROUTE_PATHS.download}>查看下载页</a></p>
             <p>常见问题：<a href={`${ROUTE_PATHS.about}#faq`}>查看 FAQ</a></p>
-            <p>联系我们：hello@yangjuandao.com（占位）</p>
+            <p>联系邮箱：hello@yangjuandao.com（占位）</p>
           </div>
         </div>
-        <p>© 2026 LambRoll Isle（羊卷岛） · {BRAND_COPY.slogan}</p>
-        <p className="version-badge">版本更新：{BUILD_TAG}</p>
+        <div className="footer-meta">
+          <p>© 2026 LambRoll Isle（羊卷岛） · {BRAND_COPY.slogan}</p>
+          <p className="version-badge">版本更新：{BUILD_TAG}</p>
+        </div>
       </footer>
 
       <FloatingSheepPet />
