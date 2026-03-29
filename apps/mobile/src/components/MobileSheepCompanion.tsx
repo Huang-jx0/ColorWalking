@@ -21,10 +21,10 @@ const MESSAGE_POOL: Record<CompanionPhase, string[]> = {
   comfort: ["辛苦了，今天也已经很棒了。"]
 };
 
-const SKIN_MAP: Record<SheepSkin, { shell: string; ear: string; scarf: string; tag: string }> = {
-  classic: { shell: "#FFF9F1", ear: "#F6EBDD", scarf: "#9FD2FF", tag: "#7BCB91" },
-  mint: { shell: "#F2FFF8", ear: "#E3F5EA", scarf: "#95E7CF", tag: "#7CCB9A" },
-  berry: { shell: "#FFF4FA", ear: "#FCE2EE", scarf: "#D7B4FF", tag: "#E38CB5" }
+const SKIN_MAP: Record<SheepSkin, { shell: string; ear: string; scarf: string; tag: string; blush: string }> = {
+  classic: { shell: "#FFF9F1", ear: "#F6EBDD", scarf: "#9FD2FF", tag: "#7BCB91", blush: "#F7B8C8" },
+  mint: { shell: "#F2FFF8", ear: "#E3F5EA", scarf: "#95E7CF", tag: "#7CCB9A", blush: "#FDBFD6" },
+  berry: { shell: "#FFF4FA", ear: "#FCE2EE", scarf: "#D7B4FF", tag: "#E38CB5", blush: "#F5B6D7" }
 };
 
 function pickMessage(pool: string[]): string {
@@ -76,7 +76,7 @@ export function MobileSheepCompanion({ phase, colorName, onPet, skin = "classic"
         translateY: breathe.interpolate({ inputRange: [0, 1], outputRange: [0, -3] })
       },
       {
-        scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.02] })
+        scale: breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] })
       }
     ]
   };
@@ -97,12 +97,14 @@ export function MobileSheepCompanion({ phase, colorName, onPet, skin = "classic"
               </View>
               <View style={styles.nose} />
               <View style={styles.mouth} />
-              <View style={styles.blushLeft} />
-              <View style={styles.blushRight} />
+              <View style={[styles.blushLeft, { backgroundColor: s.blush }]} />
+              <View style={[styles.blushRight, { backgroundColor: s.blush }]} />
             </View>
 
             <View style={[styles.scarf, { backgroundColor: s.scarf }]} />
             <View style={[styles.tag, { backgroundColor: s.tag }]} />
+            <View style={styles.pawLeft} />
+            <View style={styles.pawRight} />
           </Pressable>
         </Animated.View>
 
@@ -129,9 +131,9 @@ const styles = StyleSheet.create({
     gap: 10
   },
   petShell: {
-    width: 96,
-    height: 110,
-    borderRadius: 30,
+    width: 104,
+    height: 116,
+    borderRadius: 34,
     borderWidth: 1,
     borderColor: "#F1E4D8",
     alignItems: "center",
@@ -161,14 +163,14 @@ const styles = StyleSheet.create({
   fluffTop: {
     position: "absolute",
     top: 8,
-    width: 30,
-    height: 10,
+    width: 32,
+    height: 11,
     borderRadius: 8,
     backgroundColor: "#FFFFFF"
   },
   faceCard: {
-    width: 62,
-    height: 56,
+    width: 66,
+    height: 60,
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -218,8 +220,7 @@ const styles = StyleSheet.create({
     bottom: 12,
     width: 10,
     height: 6,
-    borderRadius: 4,
-    backgroundColor: "#F7B8C8"
+    borderRadius: 4
   },
   blushRight: {
     position: "absolute",
@@ -227,23 +228,40 @@ const styles = StyleSheet.create({
     bottom: 12,
     width: 10,
     height: 6,
-    borderRadius: 4,
-    backgroundColor: "#F7B8C8"
+    borderRadius: 4
   },
   scarf: {
     position: "absolute",
-    bottom: 16,
-    width: 56,
-    height: 11,
+    bottom: 18,
+    width: 62,
+    height: 12,
     borderRadius: 7
   },
   tag: {
     position: "absolute",
-    bottom: 13,
-    right: 21,
-    width: 8,
+    bottom: 14,
+    right: 20,
+    width: 9,
     height: 13,
     borderRadius: 3
+  },
+  pawLeft: {
+    position: "absolute",
+    bottom: 8,
+    left: 24,
+    width: 14,
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: "#F7ECDD"
+  },
+  pawRight: {
+    position: "absolute",
+    bottom: 8,
+    right: 24,
+    width: 14,
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: "#F7ECDD"
   },
   badge: {
     height: 28,

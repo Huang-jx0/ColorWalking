@@ -14,12 +14,13 @@ type PetState = {
   clean: number;
   mood: number;
   skin: SheepSkin;
+  scarves: string[];
   souvenirs: string[];
   logs: string[];
   lastActionAt: string;
 };
 
-const PET_KEY = "colorwalking.mobile.pet.v3";
+const PET_KEY = "colorwalking.mobile.pet.v4";
 const HISTORY_KEY = "colorwalking.history.v1";
 const XP_PER_LEVEL = 100;
 
@@ -31,6 +32,7 @@ const DEFAULT_PET: PetState = {
   clean: 80,
   mood: 82,
   skin: "classic",
+  scarves: [],
   souvenirs: [],
   logs: ["小羊卷住进了你的口袋养成仓。"],
   lastActionAt: new Date().toISOString()
@@ -73,7 +75,7 @@ function applyDecay(state: PetState): PetState {
 }
 
 function petLine(action: PetAction): string {
-  if (action === "feed") return "小羊卷：咩呜，好吃，心情上升！";
+  if (action === "feed") return "小羊卷：咩呜，好吃，心情上升。";
   if (action === "play") return "小羊卷：蹦蹦跳跳，陪你放松一下。";
   if (action === "rest") return "小羊卷：贴贴休息，电量回来了。";
   if (action === "groom") return "小羊卷：梳毛完毕，香香软软。";
@@ -98,6 +100,10 @@ async function readTodayLuckyColor(): Promise<string | null> {
   }
 }
 
+function scarfForColor(colorName: string): string {
+  return `${colorName}围巾`;
+}
+
 export function PetScreen() {
   const [pet, setPet] = useState<PetState>(DEFAULT_PET);
   const [phase, setPhase] = useState<"idle" | "happy" | "comfort">("idle");
@@ -107,7 +113,7 @@ export function PetScreen() {
     AsyncStorage.getItem(PET_KEY).then((raw) => {
       if (!raw) return;
       try {
-        const parsed = JSON.parse(raw) as PetState;
+        const parsed = JSON.parse(raw) as Partial<PetState>;
         setPet(applyDecay({ ...DEFAULT_PET, ...parsed }));
       } catch {
         setPet(DEFAULT_PET);
@@ -178,8 +184,29 @@ export function PetScreen() {
     return "想要抱抱";
   }, [pet.mood]);
 
-  const setSkin = (skin: SheepSkin) => {
-    setPet((prev) => ({ ...prev, skin, logs: [`外观切换为 ${skin} 套装。`, ...prev.logs].slice(0, 12) }));
+  const setSkin = (skin: SheepSkin, label: string) => {
+    setPet((prev) => ({ ...prev, skin, logs: [`外观切换为「${label}」套装。`, ...prev.logs].slice(0, 12) }));
+    setPhase("happy");
+    setTimeout(() => setPhase("idle"), 900);
+  };
+
+  const syncTodayColor = () => {
+    if (!todayColor) {
+      setPet((prev) => ({ ...prev, logs: ["今天还没有抽色，先去幸运转盘试试。", ...prev.logs].slice(0, 12) }));
+      return;
+    }
+    const scarf = scarfForColor(todayColor);
+    setPet((prev) => {
+      if (prev.scarves.includes(scarf)) {
+        return { ...prev, logs: [`今日色 ${todayColor} 已经同步过啦。`, ...prev.logs].slice(0, 12) };
+      }
+      const next = gainXp({ ...prev, mood: clamp(prev.mood + 8), scarves: [scarf, ...prev.scarves].slice(0, 8) }, 12);
+      return {
+        ...next,
+        logs: [`已同步今日色「${todayColor}」，小羊卷换上了 ${scarf}。`, ...next.logs].slice(0, 12),
+        lastActionAt: new Date().toISOString()
+      };
+    });
     setPhase("happy");
     setTimeout(() => setPhase("idle"), 900);
   };
@@ -188,17 +215,25 @@ export function PetScreen() {
     <ScrollView contentContainerStyle={styles.page}>
       <View style={styles.card}>
         <Text style={styles.title}>小羊卷养成仓</Text>
-        <Text style={styles.desc}>和网站同主题的陪伴仓：喂食、玩耍、休息、清洁、散步都在这里。</Text>
+        <Text style={styles.desc}>和网页版同主题：互动养成 + 今日色联动 + 纪念品收藏。</Text>
         <MobileSheepCompanion phase={phase} colorName={todayColor} onPet={() => runAction("pet")} skin={pet.skin} />
 
+        <View style={styles.syncBanner}>
+          <Text style={styles.syncTitle}>网页/移动端同语义联动</Text>
+          <Text style={styles.syncText}>今日幸运色：{todayColor ?? "未抽取"}</Text>
+          <Pressable style={styles.syncBtn} onPress={syncTodayColor}>
+            <Text style={styles.syncBtnText}>同步今日色围巾</Text>
+          </Pressable>
+        </View>
+
         <View style={styles.skinRow}>
-          <Pressable style={[styles.skinBtn, pet.skin === "classic" && styles.skinBtnActive]} onPress={() => setSkin("classic")}>
+          <Pressable style={[styles.skinBtn, pet.skin === "classic" && styles.skinBtnActive]} onPress={() => setSkin("classic", "经典")}> 
             <Text style={[styles.skinText, pet.skin === "classic" && styles.skinTextActive]}>经典</Text>
           </Pressable>
-          <Pressable style={[styles.skinBtn, pet.skin === "mint" && styles.skinBtnActive]} onPress={() => setSkin("mint")}>
+          <Pressable style={[styles.skinBtn, pet.skin === "mint" && styles.skinBtnActive]} onPress={() => setSkin("mint", "薄荷")}> 
             <Text style={[styles.skinText, pet.skin === "mint" && styles.skinTextActive]}>薄荷</Text>
           </Pressable>
-          <Pressable style={[styles.skinBtn, pet.skin === "berry" && styles.skinBtnActive]} onPress={() => setSkin("berry")}>
+          <Pressable style={[styles.skinBtn, pet.skin === "berry" && styles.skinBtnActive]} onPress={() => setSkin("berry", "莓莓")}> 
             <Text style={[styles.skinText, pet.skin === "berry" && styles.skinTextActive]}>莓莓</Text>
           </Pressable>
         </View>
@@ -233,6 +268,19 @@ export function PetScreen() {
       </View>
 
       <View style={styles.card}>
+        <Text style={styles.sectionTitle}>围巾衣橱</Text>
+        {pet.scarves.length ? (
+          <View style={styles.tags}>
+            {pet.scarves.map((item, idx) => (
+              <View key={`${item}-${idx}`} style={styles.tag}><Text style={styles.tagText}>{item}</Text></View>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.note}>还没有围巾，先去幸运转盘抽取今日色再同步。</Text>
+        )}
+      </View>
+
+      <View style={styles.card}>
         <Text style={styles.sectionTitle}>纪念品收藏</Text>
         {pet.souvenirs.length ? (
           <View style={styles.tags}>
@@ -263,6 +311,25 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 21, fontWeight: "800", color: CHIBI_THEME.color.textStrong, marginBottom: 6 },
   desc: { color: CHIBI_THEME.color.textSoft, lineHeight: 20, marginBottom: 8 },
+  syncBanner: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D9E7FF",
+    backgroundColor: "#F4F9FF",
+    padding: 10,
+    marginBottom: 8
+  },
+  syncTitle: { fontWeight: "800", color: CHIBI_THEME.color.textStrong },
+  syncText: { marginTop: 4, color: CHIBI_THEME.color.textNormal },
+  syncBtn: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    backgroundColor: "#4F84EA",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7
+  },
+  syncBtnText: { color: "#FFFFFF", fontWeight: "800" },
   sectionTitle: { fontSize: 17, fontWeight: "800", color: CHIBI_THEME.color.textStrong, marginBottom: 8 },
   skinRow: { flexDirection: "row", gap: 8, marginTop: 8 },
   skinBtn: {
