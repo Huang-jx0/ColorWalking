@@ -1,23 +1,36 @@
 ﻿import { IP_GALLERY, IP_WORLD, SHEEP_QUOTES } from "./config/brandWorld";
 
-const IP_SCENES = [
+const CHARACTER_PROFILE = [
+  { label: "身份", value: "颜色云岛信使" },
+  { label: "定位", value: "羊卷岛核心 IP" },
+  { label: "风格", value: "温柔、安静、柔软" },
+  { label: "能力", value: "把今日幸运色带到你身边" }
+] as const;
+
+const COMPANION_SCENES = [
   {
-    title: "桌边陪伴",
-    desc: "工作或学习时，小羊卷像一个不会打扰你、但会在场的小小守护。"
+    title: "工作陪伴",
+    detail: "放在桌边，不打扰你，只在你抬头时给你一个轻提醒。"
   },
   {
-    title: "睡前安放",
-    desc: "一天结束时，小羊卷把幸运色变成一句轻提醒，让心绪慢慢落地。"
+    title: "睡前陪伴",
+    detail: "在床头灯旁，像一句慢慢放下今天的晚安。"
   },
   {
-    title: "日常过渡",
-    desc: "在通勤、等待、发呆的间隙，它提醒你给自己留一点缓冲。"
+    title: "通勤陪伴",
+    detail: "在匆忙的时间缝隙里，提醒你给自己留一点呼吸。"
   }
+] as const;
+
+const COLLECTIBLE_HINTS = [
+  "陪伴玩偶：以日常场景为核心，不做喧闹造型。",
+  "幸运色挂饰：把当天颜色带进通勤和书包。",
+  "盲盒企划：围绕季节与情绪主题逐步展开。"
 ] as const;
 
 export function IpPage() {
   return (
-    <div className="brand-shell">
+    <div className="brand-shell ip-v2">
       <section className="section brand-panel page-head tone-mist">
         <p className="brand-kicker">LambRoll Isle · Core IP</p>
         <h1>认识小羊卷</h1>
@@ -25,9 +38,16 @@ export function IpPage() {
       </section>
 
       <section className="section brand-panel tone-cloud">
-        <h2>角色简介</h2>
+        <h2>角色档案</h2>
         <p>{IP_WORLD.intro}</p>
-        <p>它会把云岛上的颜色整理成每天的幸运色，送到你今天的生活里。</p>
+        <div className="ip-profile-grid">
+          {CHARACTER_PROFILE.map((item) => (
+            <article key={item.label}>
+              <small>{item.label}</small>
+              <p>{item.value}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="section brand-panel tone-cream">
@@ -50,12 +70,12 @@ export function IpPage() {
       </section>
 
       <section className="section brand-panel tone-cream">
-        <h2>小羊卷在日常里的位置</h2>
+        <h2>陪伴场景</h2>
         <div className="ip-scenes">
-          {IP_SCENES.map((item) => (
+          {COMPANION_SCENES.map((item) => (
             <article key={item.title}>
               <h3>{item.title}</h3>
-              <p>{item.desc}</p>
+              <p>{item.detail}</p>
             </article>
           ))}
         </div>
@@ -83,8 +103,12 @@ export function IpPage() {
       </section>
 
       <section className="section brand-panel tone-mist">
-        <h2>未来陪伴预告</h2>
-        <p>后续会逐步进入盲盒、玩偶、挂饰与更多周边。当前阶段先做内容预告，不做重商城。</p>
+        <h2>收藏向预告</h2>
+        <ul className="cw-list">
+          {COLLECTIBLE_HINTS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
         <div className="start-actions" style={{ marginTop: 12 }}>
           <a className="ghost-btn" href="/companion-plush">查看陪伴玩偶系列</a>
           <a className="ghost-btn" href="/future">查看未来陪伴页</a>

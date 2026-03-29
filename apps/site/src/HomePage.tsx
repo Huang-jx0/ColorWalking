@@ -61,6 +61,12 @@ export function HomePage({ WheelSection }: Props) {
       <section className="section brand-panel tone-mist">
         <h2>这里是羊卷岛</h2>
         <p>{BRAND_COPY.oneLiner}</p>
+        <div className="home-headline-strip">
+          <span>品牌站</span>
+          <span>产品入口</span>
+          <span>IP 承载</span>
+          <span>未来成长</span>
+        </div>
         <p>
           在这里，你会先看到今天的幸运色入口，再认识小羊卷和它所在的颜色云岛，
           最后看到这个品牌如何一步步长成更完整的陪伴世界。

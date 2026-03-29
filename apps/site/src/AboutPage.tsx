@@ -3,16 +3,16 @@ import { FAQ_ITEMS, SUPPORT_CHANNELS } from "./config/brandWorld";
 
 const BRAND_LOGIC = [
   {
-    title: "品牌层",
-    desc: "LambRoll Isle 负责品牌语气、视觉系统与长期陪伴主张。"
+    title: "从幸运色开始",
+    desc: "先用一个小动作进入今天的节奏，这是羊卷岛的产品入口。"
   },
   {
-    title: "IP层",
-    desc: "小羊卷负责角色人格、情绪语气和世界观连接。"
+    title: "由小羊卷承接",
+    desc: "角色不是装饰，而是品牌语气、情绪表达和世界观连接器。"
   },
   {
-    title: "产品层",
-    desc: "今日幸运色、桌宠与 App 负责把陪伴落到可体验的日常动作。"
+    title: "向陪伴生态生长",
+    desc: "逐步扩展到玩偶、挂饰、盲盒和更多日常陪伴内容。"
   }
 ] as const;
 
@@ -26,7 +26,7 @@ export function AboutPage() {
   }, [query]);
 
   return (
-    <div className="brand-shell">
+    <div className="brand-shell about-v2">
       <section className="section brand-panel page-head tone-mist">
         <p className="brand-kicker">About LambRoll Isle</p>
         <h1>关于羊卷岛</h1>
@@ -34,7 +34,7 @@ export function AboutPage() {
       </section>
 
       <section className="section brand-panel tone-cloud">
-        <h2>羊卷岛是什么</h2>
+        <h2>我们在做什么</h2>
         <p>羊卷岛不是单一工具页，也不是商城换皮。它是品牌官网、产品入口与 IP 承载站的统一体。</p>
       </section>
 
@@ -44,7 +44,7 @@ export function AboutPage() {
       </section>
 
       <section className="section brand-panel tone-cloud">
-        <h2>品牌结构</h2>
+        <h2>品牌逻辑</h2>
         <div className="brand-pillars">
           {BRAND_LOGIC.map((item) => (
             <article key={item.title}>
@@ -56,8 +56,8 @@ export function AboutPage() {
       </section>
 
       <section className="section brand-panel tone-cream">
-        <h2>颜色云岛底层逻辑</h2>
-        <p>颜色云岛把“颜色”定义为情绪与日常节奏的信号。今日幸运色是入口，目标是帮助你在忙碌中保留温柔仪式感。</p>
+        <h2>颜色云岛与小羊卷</h2>
+        <p>颜色云岛把“颜色”定义为情绪与日常节奏的信号。小羊卷把这些颜色带进你的今天，让陪伴变得可感知、可执行。</p>
       </section>
 
       <section className="section brand-panel tone-cloud">

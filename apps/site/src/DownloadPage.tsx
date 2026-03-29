@@ -1,6 +1,12 @@
 ﻿import { useMemo, useState } from "react";
 import { ANDROID_APK_URL, APK_MIRROR_URL } from "./config/experience";
 
+const DOWNLOAD_REASONS = [
+  { title: "每日幸运色随身可用", desc: "随时抽取今天的颜色提醒，不只停留在网页。" },
+  { title: "小羊卷持续陪伴", desc: "在 App 里继续接收角色语气、节奏和互动体验。" },
+  { title: "官网与 App 体验统一", desc: "视觉语言、文案语气和核心流程保持一致。" }
+] as const;
+
 const DOWNLOAD_ASSURANCE = [
   "官方入口：品牌域名站内路径",
   "主流程一致：网页与 App 语气同步",
@@ -26,7 +32,7 @@ export function DownloadPage() {
   };
 
   return (
-    <div className="brand-shell download-page">
+    <div className="brand-shell download-page download-v2">
       <header className="section brand-panel download-hero-v2 page-head tone-mist">
         <div className="download-copy">
           <p className="brand-kicker">LambRoll Isle · Download</p>
@@ -42,6 +48,7 @@ export function DownloadPage() {
           </div>
           <p className="apk-note">主路径：/download/app.apk · 镜像路径：/downloads/lambroll-isle-latest.apk</p>
         </div>
+
         <div className="sheep-card hero-art">
           <img src="/brand-logo.svg" alt="LambRoll Isle 小羊卷视觉" loading="eager" decoding="async" />
           <p className="hero-art-note">小羊卷会在 App 里继续陪你抽色、记录与互动。</p>
@@ -54,6 +61,18 @@ export function DownloadPage() {
       </header>
 
       <section className="section brand-panel tone-cloud">
+        <h2>为什么下载</h2>
+        <div className="brand-pillars">
+          {DOWNLOAD_REASONS.map((item) => (
+            <article key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section brand-panel tone-cream">
         <h2>安装说明</h2>
         <div className="grid">
           <article>
@@ -71,7 +90,7 @@ export function DownloadPage() {
         </div>
       </section>
 
-      <section className="section brand-panel tone-cream">
+      <section className="section brand-panel tone-cloud">
         <h2>版本与更新</h2>
         <p className="apk-note">当前版本（占位）：{version}</p>
         <p className="apk-note">更新日期（占位）：{updatedAt}</p>
