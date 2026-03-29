@@ -1,5 +1,6 @@
 ﻿export const DOWNLOAD_PAGE_PATH = "/download";
 
+export const SITE_DOMAIN = "https://www.colorful-lamb-rolls.cloud";
 const APK_CACHE_BUSTER = encodeURIComponent(import.meta.env.VITE_BUILD_TIME ?? String(Date.now()));
 const APK_MAIN_PATH = "/download/app.apk";
 const APK_MIRROR_PATH = "/downloads/colorwalking-latest.apk";
