@@ -1,5 +1,4 @@
 ﻿import { Suspense, lazy, useMemo, useState } from "react";
-import { FloatingSheepPet } from "./FloatingSheepPet";
 import { ROUTE_PATHS, TOP_NAV } from "./config/brandWorld";
 import { BRAND_COPY, DOWNLOAD_PAGE_PATH } from "./config/experience";
 
@@ -13,6 +12,7 @@ const LazyAboutPage = lazy(() => import("./AboutPage").then((mod) => ({ default:
 const LazyDownloadPage = lazy(() => import("./DownloadPage").then((mod) => ({ default: mod.DownloadPage })));
 const LazyBrandManualPage = lazy(() => import("./BrandManualPage").then((mod) => ({ default: mod.BrandManualPage })));
 const LazyCompanionPlushPage = lazy(() => import("./CompanionPlushPage").then((mod) => ({ default: mod.CompanionPlushPage })));
+const LazyFloatingSheepPet = lazy(() => import("./FloatingSheepPet").then((mod) => ({ default: mod.FloatingSheepPet })));
 
 type RouteKey = "home" | "lucky" | "ip" | "future" | "about" | "download" | "brandManual" | "companionPlush";
 
@@ -147,7 +147,9 @@ export function App() {
         </div>
       </footer>
 
-      <FloatingSheepPet />
+      <Suspense fallback={null}>
+        <LazyFloatingSheepPet />
+      </Suspense>
     </div>
   );
 }
