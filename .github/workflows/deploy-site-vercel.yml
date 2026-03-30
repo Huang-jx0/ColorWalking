@@ -1,0 +1,41 @@
+﻿name: Deploy Site To Vercel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.5
+
+      - name: Validate required secrets
+        run: |
+          test -n "$VERCEL_TOKEN" || (echo "Missing secret: VERCEL_TOKEN" && exit 1)
+          test -n "$VERCEL_ORG_ID" || (echo "Missing secret: VERCEL_ORG_ID" && exit 1)
+          test -n "$VERCEL_PROJECT_ID" || (echo "Missing secret: VERCEL_PROJECT_ID" && exit 1)
+
+      - name: Deploy production
+        run: pnpm dlx vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
