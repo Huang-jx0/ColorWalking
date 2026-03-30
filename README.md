@@ -32,6 +32,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-site.ps1
 ```powershell
 npm run sync:pull
 ```
+- `sync:pull` 现在会在工作区不干净时自动 `stash -u`，拉取完成后自动恢复本地改动。
 - 在任意地点改完后一键提交并推送：
 ```powershell
 npm run sync:push
@@ -40,6 +41,11 @@ npm run sync:push
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\sync-push.ps1 -Message "feat: your message"
 ```
+
+### 同步相关默认忽略项
+- `AGENTS.md`
+- `apps/mobile/eas-log-*.txt`
+- `apps/site/public/downloads/*.apk`
 
 ## 浏览器下载 APK（Android）
 1. 登录 Expo（首次需要）：

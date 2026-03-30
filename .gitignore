@@ -31,3 +31,8 @@ tools/
 
 dist/
 .vercel
+
+# local generated artifacts
+AGENTS.md
+apps/mobile/eas-log-*.txt
+apps/site/public/downloads/*.apk

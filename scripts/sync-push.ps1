@@ -17,6 +17,29 @@ function Invoke-Git {
   }
 }
 
+function Invoke-GitWithRetry {
+  param(
+    [Parameter(Mandatory = $true)][string[]]$Args,
+    [int]$MaxAttempts = 3,
+    [int]$DelaySeconds = 2
+  )
+
+  $attempt = 1
+  while ($attempt -le $MaxAttempts) {
+    try {
+      Invoke-Git -Args $Args
+      return
+    } catch {
+      if ($attempt -ge $MaxAttempts) {
+        throw
+      }
+      Write-Host "Git command failed (attempt $attempt/$MaxAttempts). Retrying in $DelaySeconds seconds..."
+      Start-Sleep -Seconds $DelaySeconds
+      $attempt++
+    }
+  }
+}
+
 $dirty = & git -c "safe.directory=$safeRepo" status --porcelain
 if (-not $dirty) {
   Write-Host "No local changes to commit."
@@ -25,7 +48,7 @@ if (-not $dirty) {
 
 Invoke-Git -Args @("-c", "safe.directory=$safeRepo", "add", "-A")
 Invoke-Git -Args @("-c", "safe.directory=$safeRepo", "commit", "-m", $Message)
-Invoke-Git -Args @("-c", "safe.directory=$safeRepo", "push", "origin", "main")
+Invoke-GitWithRetry -Args @("-c", "safe.directory=$safeRepo", "push", "origin", "main")
 
 $head = & git -c "safe.directory=$safeRepo" rev-parse --short HEAD
 Write-Host "Committed and pushed: $head"
