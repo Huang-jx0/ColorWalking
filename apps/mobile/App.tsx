@@ -1,55 +1,57 @@
-﻿import React, { useMemo, useState } from "react";
-import { Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
-import { CHIBI_THEME } from "../../packages/chibi-ui/src";
-import { FeaturesScreen } from "./src/screens/FeaturesScreen";
+﻿import React, { useState } from "react";
+import { Image, Linking, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { CompanionHubScreen } from "./src/screens/CompanionHubScreen";
 import { LuckyWheelScreen } from "./src/screens/LuckyWheelScreen";
-import { OracleScreen } from "./src/screens/OracleScreen";
-import { PetScreen } from "./src/screens/PetScreen";
 
-type TabKey = "features" | "wheel" | "oracle" | "pet";
+type FeaturedProduct = {
+  name: string;
+  tagline: string;
+  mobileImageUrl: string;
+  websiteUrl: string;
+};
 
-const TABS: Array<{ key: TabKey; label: string }> = [
-  { key: "features", label: "产品亮点" },
-  { key: "wheel", label: "幸运转盘" },
-  { key: "oracle", label: "时色签" },
-  { key: "pet", label: "小羊卷" }
-] as const;
+const FEATURED_PRODUCT: FeaturedProduct = {
+  name: "小羊卷官方主视觉",
+  tagline: "来自官网同源品牌素材",
+  mobileImageUrl: "https://www.colorful-lamb-rolls.cloud/images/products/official/sheep-roll-official.jpg",
+  websiteUrl: "https://www.colorful-lamb-rolls.cloud"
+};
 
 export default function App() {
-  const [tab, setTab] = useState<TabKey>("features");
-
-  const subtitle = useMemo(() => {
-    if (tab === "features") return "品牌入口、IP世界观与陪伴路线";
-    if (tab === "wheel") return "抽取你的今日幸运色";
-    if (tab === "oracle") return "今天的时色签和小提醒";
-    return "小羊卷养成仓";
-  }, [tab]);
+  const [activeTab, setActiveTab] = useState<"companion" | "lucky_color">("companion");
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.container}>
         <Text style={styles.brand}>ColorWalking</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text style={styles.subtitle}>小羊卷数字生命体 · 温柔低打扰陪伴</Text>
 
-        <View style={styles.content}>
-          {tab === "features" ? <FeaturesScreen onNavigate={setTab} /> : null}
-          {tab === "wheel" ? <LuckyWheelScreen /> : null}
-          {tab === "oracle" ? <OracleScreen /> : null}
-          {tab === "pet" ? <PetScreen /> : null}
+        <View style={styles.productCard}>
+          <Image source={{ uri: FEATURED_PRODUCT.mobileImageUrl }} style={styles.productImage} />
+          <Text style={styles.productTitle}>{FEATURED_PRODUCT.name}</Text>
+          <Text style={styles.productTagline}>{FEATURED_PRODUCT.tagline}</Text>
+          <Pressable style={styles.productBtn} onPress={() => Linking.openURL(FEATURED_PRODUCT.websiteUrl)}>
+            <Text style={styles.productBtnText}>打开官网</Text>
+          </Pressable>
         </View>
 
-        <View style={styles.tabBar}>
-          {TABS.map((item) => (
-            <Pressable
-              key={item.key}
-              style={[styles.tabBtn, tab === item.key && styles.tabBtnActive]}
-              onPress={() => setTab(item.key)}
-            >
-              <Text style={[styles.tabText, tab === item.key && styles.tabTextActive]}>{item.label}</Text>
-            </Pressable>
-          ))}
+        <View style={styles.topTabs}>
+          <Pressable
+            style={[styles.topTab, activeTab === "companion" && styles.topTabActive]}
+            onPress={() => setActiveTab("companion")}
+          >
+            <Text style={[styles.topTabText, activeTab === "companion" && styles.topTabTextActive]}>数字生命体</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.topTab, activeTab === "lucky_color" && styles.topTabActive]}
+            onPress={() => setActiveTab("lucky_color")}
+          >
+            <Text style={[styles.topTabText, activeTab === "lucky_color" && styles.topTabTextActive]}>幸运色转盘</Text>
+          </Pressable>
         </View>
+
+        {activeTab === "companion" ? <CompanionHubScreen /> : <LuckyWheelScreen />}
       </View>
     </SafeAreaView>
   );
@@ -58,52 +60,81 @@ export default function App() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: CHIBI_THEME.color.pageBg
+    backgroundColor: "#F4F6FB"
   },
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 8
+    paddingHorizontal: 20,
+    paddingTop: 12
   },
   brand: {
-    fontSize: 38,
-    fontWeight: "900",
-    color: CHIBI_THEME.color.textStrong
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#1F2A44"
   },
   subtitle: {
     marginTop: 4,
-    marginBottom: 10,
+    marginBottom: 12,
     fontSize: 15,
-    color: CHIBI_THEME.color.textSoft
+    color: "#62708A"
   },
-  content: {
-    flex: 1
+  productCard: {
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 14,
+    backgroundColor: "#FFFFFF"
   },
-  tabBar: {
+  productImage: {
+    width: "100%",
+    height: 140,
+    borderRadius: 10,
+    marginBottom: 8
+  },
+  productTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1F2A44"
+  },
+  productTagline: {
+    marginTop: 2,
+    marginBottom: 8,
+    color: "#61708B"
+  },
+  productBtn: {
+    alignSelf: "flex-start",
+    borderRadius: 8,
+    backgroundColor: "#1F2A44",
+    paddingHorizontal: 10,
+    paddingVertical: 7
+  },
+  productBtnText: {
+    color: "#FFFFFF",
+    fontWeight: "700"
+  },
+  topTabs: {
+    width: "100%",
     flexDirection: "row",
     gap: 8,
-    paddingVertical: 10
+    marginBottom: 10
   },
-  tabBtn: {
+  topTab: {
     flex: 1,
-    borderRadius: CHIBI_THEME.radius.pill,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#D6DEEE",
+    borderColor: "#CFDAEE",
     backgroundColor: "#FFFFFF",
-    paddingVertical: 10,
+    paddingVertical: 8,
     alignItems: "center"
   },
-  tabBtnActive: {
-    backgroundColor: CHIBI_THEME.color.primary,
-    borderColor: CHIBI_THEME.color.primary
+  topTabActive: {
+    backgroundColor: "#1F2A44",
+    borderColor: "#1F2A44"
   },
-  tabText: {
-    color: CHIBI_THEME.color.textNormal,
-    fontWeight: "700",
-    fontSize: 12
+  topTabText: {
+    color: "#34425D",
+    fontWeight: "600"
   },
-  tabTextActive: {
+  topTabTextActive: {
     color: "#FFFFFF"
   }
 });
-
